@@ -62,7 +62,6 @@ NOT=36
 'loop'=27
 'pool'=28
 'new'=29
-'type'=30
 'isvoid'=31
 'true'=34
 'false'=35

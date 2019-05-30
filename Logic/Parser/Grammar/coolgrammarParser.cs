@@ -54,8 +54,8 @@ public partial class coolgrammarParser : Parser {
 		null, "';'", "'{'", "'}'", "'('", "')'", "':'", "'<-'", "','", "'*'", 
 		"'/'", "'+'", "'-'", "'<'", "'<='", "'='", "'~'", "'class'", "'inherits'", 
 		"'let'", "'in'", null, "'if'", "'then'", "'else'", "'fi'", "'while'", 
-		"'loop'", "'pool'", "'new'", "'type'", "'isvoid'", null, null, "'true'", 
-		"'false'", "'not'"
+		"'loop'", "'pool'", "'new'", null, "'isvoid'", null, null, "'true'", "'false'", 
+		"'not'"
 	};
 	private static readonly string[] _SymbolicNames = {
 		null, null, null, null, null, null, null, null, null, null, null, null, 
