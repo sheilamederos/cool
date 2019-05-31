@@ -100,8 +100,8 @@ namespace Logic
             }
 
             string father;
-            if (context.TYPE(1) == null) father = "object";
-            else father = context.TYPE(1).GetText();
+            if (context.TYPE().Length > 1) father = context.TYPE(1).GetText();
+            else father = "object";
 
             return new Class_Def(new Type_cool(context.TYPE(0).GetText()), new Type_cool(father), new Lista<Method_Def>(met), new Lista<Attr_Def>(attr));
         }

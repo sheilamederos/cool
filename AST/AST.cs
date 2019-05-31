@@ -48,6 +48,11 @@ namespace AST
 
         public override Q Visit<Q>(IVisitorAST<Q> visitor) => visitor.Visit(this);
 
+        public override string ToString()
+        {
+            return "Lista de" ; 
+        }
+
 
     }
 
