@@ -1,12 +1,12 @@
 
 grammar coolgrammar;
 
-program : (class ';')+ ;
+program : (class ';')+;
 
 class	: CLASS TYPE ( INHERITS TYPE)? '{' (feature ';')* '}' ;
 
-feature : method																# f_method
-		| attr																	# f_attr
+feature : attr											# f_attr
+		| method										# f_method						
 		;
 
 method  : ID '(' args_def ')' ':' TYPE '{' expr '}' ;						
@@ -52,10 +52,10 @@ WHILE : 'while';
 LOOP : 'loop';
 POOL : 'pool';
 NEW : 'new';
-TYPE : [A-Z][_0-9A-Za-z]*;
+TYPE : [A-Z][_0-9A-Za-z]*;														# type
 ISVOID : 'isvoid';
 INTEGER : [0-9]+;
-ID : [A-Z][_0-9A-Za-z]*;
+ID : [a-z][_0-9A-Za-z]*;
 TRUE : 'true';
 FALSE : 'false';
 NOT : 'not';

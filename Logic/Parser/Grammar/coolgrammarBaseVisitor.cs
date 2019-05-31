@@ -54,17 +54,6 @@ public partial class coolgrammarBaseVisitor<Result> : AbstractParseTreeVisitor<R
 	/// <return>The visitor result.</return>
 	public virtual Result VisitClass([NotNull] coolgrammarParser.ClassContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by the <c>f_method</c>
-	/// labeled alternative in <see cref="coolgrammarParser.feature"/>.
-	/// <para>
-	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
-	/// on <paramref name="context"/>.
-	/// </para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	public virtual Result VisitF_method([NotNull] coolgrammarParser.F_methodContext context) { return VisitChildren(context); }
-	/// <summary>
 	/// Visit a parse tree produced by the <c>f_attr</c>
 	/// labeled alternative in <see cref="coolgrammarParser.feature"/>.
 	/// <para>
@@ -75,6 +64,17 @@ public partial class coolgrammarBaseVisitor<Result> : AbstractParseTreeVisitor<R
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	public virtual Result VisitF_attr([NotNull] coolgrammarParser.F_attrContext context) { return VisitChildren(context); }
+	/// <summary>
+	/// Visit a parse tree produced by the <c>f_method</c>
+	/// labeled alternative in <see cref="coolgrammarParser.feature"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitF_method([NotNull] coolgrammarParser.F_methodContext context) { return VisitChildren(context); }
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="coolgrammarParser.method"/>.
 	/// <para>
