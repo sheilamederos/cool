@@ -124,7 +124,8 @@ namespace Logic
                 var v = Visit(item);
                 args.Add((Formal)v);
             }
-            return new Method_Def(new Id(context.ID().GetText()), new Type_cool(context.TYPE().GetText()), new Lista<Formal>(args));
+            Expr exp = (Expr)Visit(context.expr());
+            return new Method_Def(new Id(context.ID().GetText()), new Type_cool(context.TYPE().GetText()), new Lista<Formal>(args), exp);
         }
 
         public override Node VisitAttr([NotNull] coolgrammarParser.AttrContext context)

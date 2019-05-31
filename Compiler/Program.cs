@@ -43,7 +43,6 @@ namespace Compiler
 
                         metodo2() : int { let a : int <- 3, b : int <- 5 in a * b; };
 
-
                         metodo4() : bool { not true; };
                     }; ";
             DFS(GetAST.Show(text));

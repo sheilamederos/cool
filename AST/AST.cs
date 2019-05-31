@@ -83,11 +83,13 @@ namespace AST
         public Id name;
         public Type_cool type;
         public Lista<Formal> args;
-        public Method_Def(Id n, Type_cool t, Lista<Formal> a) : base ( new Node[] { n, t, a })
+        public Expr exp;
+        public Method_Def(Id n, Type_cool t, Lista<Formal> a, Expr e) : base ( new Node[] { n, t, a, e })
         {
             name = n;
             type = t;
             args = a;
+            exp = e;
         }
 
         public override T Visit<T>(IVisitorAST<T> visitor) => visitor.Visit(this);
