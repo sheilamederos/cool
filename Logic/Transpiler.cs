@@ -162,7 +162,7 @@ namespace Logic
         {
             Expr exp = (Expr)Visit(context.expr());
             Type_cool t = null;
-            if (context.TYPE() != null) t = (Type_cool)Visit(context.TYPE());
+            if (context.TYPE() != null) t = new Type_cool(context.TYPE().GetText());
             Id id = new Id(context.ID().GetText());
             var list = new List<Expr>();
             foreach (var item in context.args_call().expr())
@@ -213,7 +213,11 @@ namespace Logic
             }
             return new Body(new Lista<Expr>(list));
         }
-        
+
+        public override Node VisitString([NotNull] coolgrammarParser.StringContext context)
+        {
+            return new Str(context.STR().GetText());
+        }
 
         public override Node VisitNew_type([NotNull] coolgrammarParser.New_typeContext context)
         {

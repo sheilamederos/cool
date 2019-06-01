@@ -30,6 +30,7 @@ expr    : expr ('@' TYPE)? '.' ID '(' args_call ')'								# dispatch
 		| ID											                        # id
 		| INTEGER										                        # int
 		| cons = (TRUE | FALSE)						                            # bool
+		| STR																	# string
 		| ID '<-' expr								                            # assign
 		| LET attr (',' attr )* IN expr										    # let
 		;
@@ -39,6 +40,7 @@ expr_list : (expr ';')+ ;
 args_def  : ( formal(',' formal)*)? ;	
 args_call : (expr (','expr)* )?;
 
+STR : '"' (ESC | ~ ["\\])* '"';
 
 CLASS : 'class';
 INHERITS : 'inherits';
@@ -61,3 +63,9 @@ FALSE : 'false';
 NOT : 'not';
 
 ID : [a-z][_0-9A-Za-z]*;
+
+fragment ESC : '\\' (["\\/bfnrt] | UNICODE);
+
+fragment UNICODE : 'u' HEX HEX HEX HEX;
+
+fragment HEX : [0-9a-fA-F];

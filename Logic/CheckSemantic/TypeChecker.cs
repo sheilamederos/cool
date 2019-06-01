@@ -151,5 +151,10 @@ namespace Logic.CheckSemantic
         {
             throw new NotImplementedException();
         }
+
+        public bool Visit(Str node)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

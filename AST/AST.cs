@@ -197,7 +197,7 @@ namespace AST
             this.exp = exp;
             this.type = type;
             this.call = call;
-            s = (this.type != null) ? this.type.s : "sin castear "; 
+            s = (this.type != null) ? this.type.s + ' ' : "sin castear "; 
         }
 
         public override T Visit<T>(IVisitorAST<T> visitor) => visitor.Visit(this);
@@ -205,6 +205,21 @@ namespace AST
         public override string ToString()
         {
             return "Dispatch: " + "Exp: " + exp.ToString() + " " + "tipo: " + this.s + call.ToString() ;
+        }
+    }
+
+    public class Str : Expr
+    {
+        public string s;
+        public Str(string s) : base (null)
+        {
+            this.s = s.Substring(1, s.Length - 2);
+        }
+        public override T Visit<T>(IVisitorAST<T> visitor) => visitor.Visit(this);
+
+        public override string ToString()
+        {
+            return s;
         }
     }
 
