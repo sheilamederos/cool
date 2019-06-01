@@ -129,5 +129,10 @@ namespace Logic.CheckSemantic
         {
             throw new NotImplementedException();
         }
+
+        public bool Visit(Dispatch node)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

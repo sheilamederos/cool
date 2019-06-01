@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from c:\users\ale\documents\visual studio 2017\projects\compiler\logic\parser\grammar\coolgrammar.g4 by ANTLR 4.7.1
+// Generated from C:\Users\Ale\documents\visual studio 2017\Projects\Compiler\Logic\Parser\Grammar\coolgrammar.g4 by ANTLR 4.7.1
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -180,6 +180,13 @@ public interface IcoolgrammarVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitParentesis([NotNull] coolgrammarParser.ParentesisContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>dispatch</c>
+	/// labeled alternative in <see cref="coolgrammarParser.expr"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitDispatch([NotNull] coolgrammarParser.DispatchContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>bool</c>
 	/// labeled alternative in <see cref="coolgrammarParser.expr"/>.

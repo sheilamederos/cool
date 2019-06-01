@@ -18,7 +18,7 @@ namespace Logic
             var input = new AntlrInputStream(text);
             var lexer = new coolgrammarLexer(input);
             var tokens = new CommonTokenStream(lexer);
-            var parser = new coolgrammarParser(tokens) { BuildParseTree = true };
+            var parser = new coolgrammarParser(tokens);
             //Console.WriteLine(parser.program().ToString(parser));
             
             var v = new Transpiler();
@@ -158,6 +158,21 @@ namespace Logic
             return new Call_Method(new Id(context.ID().GetText()), new Lista<Expr>(list));
         }
 
+        public override Node VisitDispatch([NotNull] coolgrammarParser.DispatchContext context)
+        {
+            Expr exp = (Expr)Visit(context.expr());
+            Type_cool t = null;
+            if (context.TYPE() != null) t = (Type_cool)Visit(context.TYPE());
+            Id id = new Id(context.ID().GetText());
+            var list = new List<Expr>();
+            foreach (var item in context.args_call().expr())
+            {
+                var v = Visit(item);
+                list.Add((Expr)v);
+            }
+
+            return new Dispatch(exp, t, new Call_Method(id, new Lista<Expr>(list)));
+        }
         public override Node VisitLet([NotNull] coolgrammarParser.LetContext context)
         {
             List<Attr_Def> list = new List<Attr_Def>();

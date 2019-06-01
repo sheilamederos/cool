@@ -28,6 +28,8 @@ namespace AST
 
         T Visit(Call_Method node);
 
+        T Visit(Dispatch node);
+
         T Visit(Let_In node);
 
         T Visit(If_Else node);
