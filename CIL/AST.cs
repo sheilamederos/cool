@@ -217,13 +217,13 @@ namespace CIL
     {
         public string Dest;
         public string Instance;
-        public CIL_OneType MyType;
+        public string Attr;
 
-        public CIL_GetAttr(string dest, string instance, CIL_OneType myType)
+        public CIL_GetAttr(string dest, string instance, string attr)
         {
             Dest = dest;
             Instance = instance;
-            MyType = myType;
+            Attr = attr;
         }
 
         public override void Accept(IVisitor visitor) => visitor.Accept(this);
@@ -232,13 +232,13 @@ namespace CIL
     public class CIL_SetAttr : CIL_Instruction
     {
         public string Instance;
-        public CIL_OneType MyType;
+        public string Attr;
         public string Value;
 
-        public CIL_SetAttr(string instance, CIL_OneType myType, string value)
+        public CIL_SetAttr(string instance, string attr, string value)
         {
             Instance = instance;
-            MyType = myType;
+            Attr = attr;
             Value = value;
         }
 
@@ -248,19 +248,50 @@ namespace CIL
     public class CIL_VCall : CIL_Instruction
     {
         public string Dest;
-        public CIL_OneType MyType;
-        public string FuncName;
+        public string MyType;
+        public string Name;
+        public List<string> Args;
 
-        public CIL_VCall(string dest, CIL_OneType myType, string funcName)
+        public CIL_VCall(string dest, string myType, string name, List<string> args)
         {
             Dest = dest;
             MyType = myType;
-            FuncName = funcName;
+            Name = name;
+            Args = args;
         }
 
         public override void Accept(IVisitor visitor) => visitor.Accept(this);
     }
 
+    public class CIL_Typeof : CIL_Instruction
+    {
+        public string dest;
+        public string expr;
+        public CIL_Typeof(string dest, string expr)
+        {
+            this.dest = dest;
+            this.expr = expr;
+        }
+
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
+
+    }
+
+    public class CIL_Call : CIL_Instruction
+    {
+        public string Dest;
+        public string Name;
+        public List<string> Args;
+
+        public CIL_Call(string dest, string name, List<string> args)
+        {
+            Dest = dest;
+            Name = name;
+            Args = args;
+        }
+
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
+    }
     public class CIL_Allocate : CIL_Instruction
     {
         public string Dest;
@@ -275,19 +306,7 @@ namespace CIL
         public override void Accept(IVisitor visitor) => visitor.Accept(this);
     }
 
-    public class CIL_Call : CIL_Instruction
-    {
-        public string Dest;
-        public CIL_Function MyFunc;
-
-        public CIL_Call(string dest, CIL_Function myFunc)
-        {
-            Dest = dest;
-            MyFunc = myFunc;
-        }
-
-        public override void Accept(IVisitor visitor) => visitor.Accept(this);
-    }
+    
 
     public class CIL_Load : CIL_Instruction
     {

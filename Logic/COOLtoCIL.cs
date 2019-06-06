@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CIL;
 using AST;
+using Logic.CheckSemantic;
 
 namespace Logic
 {
@@ -123,17 +124,21 @@ namespace Logic
     public class CoolToCil : IVisitorAST<string>
     {
         Take_str take_data;
+
         public Dictionary<string, string> Data;
-        List<CIL_Function> Code;
-        List<CIL_OneType> Types;
+        Dictionary<string, CIL_Function> Code;
+        Dictionary<string, CIL_OneType> Types;
+
         Current_Method method;
+        Dictionary<string, IType> Types_Cool;
+        IType current_type;
 
         public CoolToCil()
         {
             method = new Current_Method();
             Data = new Dictionary<string, string>();
-            Code = new List<CIL_Function>();
-            Types = new List<CIL_OneType>();
+            Code = new Dictionary<string, CIL_Function>();
+            Types = new Dictionary<string, CIL_OneType>();
 
         }
 
@@ -145,7 +150,7 @@ namespace Logic
 
         public string Visit(Program node)
         {
-            Dictionary<string, IType> Types_Cool = IType.GetAllTypes(node);
+            Types_Cool = IType.GetAllTypes(node);
 
             foreach (var key in Types_Cool.Keys)
             {
@@ -160,10 +165,11 @@ namespace Logic
 
                 foreach (var mtd in type.AllMethods()) 
                 {
-                    mtds.Add(new Tuple<string, string>(mtd.Name, mtd.Name + "_" + key));
+                    string mtd_name = mtd.Name + "_" + key;
+                    mtds.Add(new Tuple<string, string>(mtd.Name, mtd_name));
                 }
 
-                Types.Add(new CIL_OneType(attrs, mtds));
+                Types[key] = new CIL_OneType(attrs, mtds);
             }
 
             foreach (var item in node.list)
@@ -175,6 +181,7 @@ namespace Logic
 
         public string Visit(Class_Def node)
         {
+            current_type = Types_Cool[node.type.s];
             foreach (Method_Def item in node.method.list_Node)
             {
                 Visit(item);
@@ -184,10 +191,10 @@ namespace Logic
 
         public string Visit(Method_Def node)
         {
+            method = new Current_Method();
             string solution = Visit(node.exp);
             method.Add_Instruction(new CIL_Return("ret", solution));
-            Code.Add(new CIL_Function(node.name.name, new List<string>(node.args.list_Node.Select(x => x.name.name)), new List<string>(method.locals.Values), method.body));
-            method = new Current_Method();
+            Code.Add(node.name.name, new CIL_Function(node.name.name, new List<string>(node.args.list_Node.Select(x => x.name.name)), new List<string>(method.locals.Values), method.body));
             return "";
         }
 
@@ -225,12 +232,47 @@ namespace Logic
 
         public string Visit(Call_Method node)
         {
-            throw new NotImplementedException();
+            List<string> Args = new List<string>();
+            Args.Add("this");
+            foreach (var exp in node.args.list_Node)
+            {
+                string value = Visit(exp);
+                Args.Add(value);
+            }
+            var expr = method.Add_local("expr", true);
+
+            method.Add_Instruction(new CIL_Call(expr, node.name.name, Args));
+            return expr;
+
         }
 
         public string Visit(Dispatch node)
         {
-            throw new NotImplementedException();
+            var exp = Visit(node.exp);
+
+            string type = "";
+            
+            if(node.s != "sin castear ")
+            {
+                type = node.s;
+            }
+            else
+            {
+                type = method.Add_local("typeof", true);
+                method.Add_Instruction(new CIL_Typeof(type, exp));
+            }
+
+            List<string> Args = new List<string>();
+            Args.Add(exp);
+            foreach (var item in node.call.args.list_Node)
+            {
+                string value = Visit(item);
+                Args.Add(value);
+            }
+            var expr = method.Add_local("expr", true);
+
+            method.Add_Instruction(new CIL_VCall(expr, type, node.call.name.name, Args));
+            return expr;
         }
 
         public string Visit(Let_In node)
@@ -329,19 +371,52 @@ namespace Logic
 
         public string Visit(Assign node)
         {
-            throw new NotImplementedException();
             var exp = Visit(node.exp);
-            //NECESITAMOS QUE SHEILA DEJE DE COMER PINGA
+            if (Data.ContainsValue(exp))
+            {
+                string dest = method.Add_local("dest", true);
+                method.Add_Instruction(new CIL_Load(dest, exp));
+                return dest;
+            }
+            else
+            {
+                string ret = method.current_scope.Get_var(node.id.name);
+                if(ret == null && method.args.Contains(node.id.name))
+                {
+                    method.Add_Instruction(new CIL_Assig(node.id.name, exp));
+                    return exp;
+                }
+                else if(ret == null && current_type.GetAttribute(node.id.name) != null)
+                {
+                    method.Add_Instruction(new CIL_SetAttr("this", node.id.name, exp));
+                    return exp;
+                }
+                else
+                {
+                    method.Add_Instruction(new CIL_Assig(ret, exp));
+                    return exp;
+                }
+            }
         }
 
         public string Visit(Id node)
         {
-            throw new NotImplementedException();
-            //if (method.current_scope.Get_var(node.name) == null && method.args.Contains(node.name))
-            //{
-            //    return node.name;
-            //}
-            //else if ()
+            string var = method.current_scope.Get_var(node.name);
+
+            if (var == null && method.args.Contains(node.name))
+            {
+                return node.name;
+            }
+            else if (var == null && current_type.GetAttribute(node.name) != null)
+            {
+                var attr = method.Add_local("attr", true);
+                method.Add_Instruction(new CIL_GetAttr(attr, "this", node.name));
+                return attr;
+            }
+            else
+            {
+                return var;
+            }
         }
 
         public string Visit(Const node)
@@ -351,7 +426,7 @@ namespace Logic
             {
                 return node.name;
             }
-            else if (node.name.ToUpper() == "TRUE")
+            else if (node.name == "true")
             {
                 return "1";
             }
