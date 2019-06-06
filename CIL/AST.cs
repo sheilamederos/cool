@@ -197,12 +197,12 @@ namespace CIL
 
     public class CIL_ArithExpr : CIL_Instruction
     {
-        public CIL_MyVar Dest;
-        public CIL_Instruction RigthOp;
-        public CIL_Instruction LeftOp;
+        public string Dest;
+        public string RigthOp;
+        public string LeftOp;
         public string Op;
 
-        public CIL_ArithExpr(CIL_MyVar dest, CIL_Instruction rigthOp, CIL_Instruction leftOp, string op)
+        public CIL_ArithExpr(string dest, string rigthOp, string leftOp, string op)
         {
             Dest = dest;
             RigthOp = rigthOp;
@@ -264,9 +264,9 @@ namespace CIL
     public class CIL_Allocate : CIL_Instruction
     {
         public string Dest;
-        public CIL_OneType MyType;
+        public string MyType;
 
-        public CIL_Allocate(string dest, CIL_OneType myType)
+        public CIL_Allocate(string dest, string myType)
         {
             Dest = dest;
             MyType = myType;

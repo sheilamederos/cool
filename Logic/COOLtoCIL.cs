@@ -235,7 +235,13 @@ namespace Logic
 
         public string Visit(Let_In node)
         {
-            throw new NotImplementedException();
+            method.Add_scope("let");
+            Visit(node.attrs);
+            var exp = Visit(node.exp);
+            var ret = method.Add_local("expr", true);
+            method.Add_Instruction(new CIL_Assig(ret, exp));
+            method.End_scope();
+            return ret;
         }
 
         public string Visit(If_Else node)
@@ -262,17 +268,38 @@ namespace Logic
 
         public string Visit(While_loop node)
         {
-            throw new NotImplementedException();
+            var begin_while = method.current_scope.Get_var("begin_while");
+            var body_while = method.current_scope.Get_var("body_while");
+            var end_while = method.current_scope.Get_var("end_while");
+
+            var ret = method.Add_local("ret_while", true);
+            var cond = Visit(node.exp1);
+            var body = Visit(node.exp2);
+            method.Add_Instruction(new CIL_Label(begin_while));
+            method.Add_Instruction(new CIL_If(cond, body_while));
+            method.Add_Instruction(new CIL_Goto(end_while));
+            method.Add_Instruction(new CIL_Label(body_while));
+            method.Add_Instruction(new CIL_Assig(ret, body));
+            method.Add_Instruction(new CIL_Goto(begin_while));
+            method.Add_Instruction(new CIL_Label(end_while));
+            return ret;
+
         }
 
         public string Visit(Body node)
         {
-            throw new NotImplementedException();
+            foreach (var item in node.list.list_Node)
+            {
+                 item?.Visit(this);
+            }
+            return "";
         }
 
         public string Visit(New_type node)
         {
-            throw new NotImplementedException();
+            var ret = method.Add_local("expr", true);
+            method.Add_Instruction(new CIL_Allocate(ret, node.type.s));
+            return ret;
         }
 
         public string Visit(IsVoid node)
@@ -285,7 +312,11 @@ namespace Logic
 
         public string Visit(BinaryExpr node)
         {
-            throw new NotImplementedException();
+            var left = Visit(node.left);
+            var right = Visit(node.right);
+            var ret = method.Add_local("expr", true);
+            method.Add_Instruction(new CIL_ArithExpr(ret, left, right, node.op));
+            return ret;
         }
 
         public string Visit(UnaryExpr node)
@@ -329,7 +360,11 @@ namespace Logic
 
         public string Visit(Lista<Node> node)
         {
-            throw new NotImplementedException();
+            foreach (var item in node.list_Node)
+            {
+                item.Visit(this);
+            }
+            return "";
         }
     }
 }
