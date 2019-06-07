@@ -22,10 +22,10 @@ expr    : expr ('@' TYPE)? '.' ID '(' args_call ')'								# dispatch
 		| '{' expr_list '}'								                        # body
 		| NEW TYPE										                        # new_type
 		| ISVOID expr									                        # isvoid
-        | op = ( NOT | '~' ) expr						                        # unary_exp
 		| expr op = ('*' | '/') expr					                        # multdiv
         | expr op = ('+' | '-') expr 				                            # sumaresta
         | expr op = ('<' | '<=' | '=') expr				                        # comp
+        | op = ( NOT | '~' ) expr						                        # unary_exp
         | '(' expr ')'									                        # parentesis
 		| INTEGER										                        # int
 		| cons = (TRUE | FALSE)						                            # bool

@@ -52,7 +52,7 @@ public partial class coolgrammarParser : Parser {
 
 	private static readonly string[] _LiteralNames = {
 		null, "';'", "'{'", "'}'", "'('", "')'", "':'", "'<-'", "'@'", "'.'", 
-		"'~'", "'*'", "'/'", "'+'", "'-'", "'<'", "'<='", "'='", "','", null, 
+		"'*'", "'/'", "'+'", "'-'", "'<'", "'<='", "'='", "'~'", "','", null, 
 		"'class'", "'inherits'", "'let'", "'in'", null, "'if'", "'then'", "'else'", 
 		"'fi'", "'while'", "'loop'", "'pool'", "'new'", null, "'isvoid'", null, 
 		"'true'", "'false'", "'not'"
@@ -772,14 +772,14 @@ public partial class coolgrammarParser : Parser {
 				State = 95;
 				((Unary_expContext)_localctx).op = TokenStream.LT(1);
 				_la = TokenStream.LA(1);
-				if ( !(_la==T__9 || _la==NOT) ) {
+				if ( !(_la==T__16 || _la==NOT) ) {
 					((Unary_expContext)_localctx).op = ErrorHandler.RecoverInline(this);
 				}
 				else {
 					ErrorHandler.ReportMatch(this);
 				    Consume();
 				}
-				State = 96; expr(11);
+				State = 96; expr(8);
 				}
 				break;
 			case 8:
@@ -887,18 +887,18 @@ public partial class coolgrammarParser : Parser {
 						_localctx = new MultdivContext(new ExprContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expr);
 						State = 122;
-						if (!(Precpred(Context, 10))) throw new FailedPredicateException(this, "Precpred(Context, 10)");
+						if (!(Precpred(Context, 11))) throw new FailedPredicateException(this, "Precpred(Context, 11)");
 						State = 123;
 						((MultdivContext)_localctx).op = TokenStream.LT(1);
 						_la = TokenStream.LA(1);
-						if ( !(_la==T__10 || _la==T__11) ) {
+						if ( !(_la==T__9 || _la==T__10) ) {
 							((MultdivContext)_localctx).op = ErrorHandler.RecoverInline(this);
 						}
 						else {
 							ErrorHandler.ReportMatch(this);
 						    Consume();
 						}
-						State = 124; expr(11);
+						State = 124; expr(12);
 						}
 						break;
 					case 2:
@@ -906,18 +906,18 @@ public partial class coolgrammarParser : Parser {
 						_localctx = new SumarestaContext(new ExprContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expr);
 						State = 125;
-						if (!(Precpred(Context, 9))) throw new FailedPredicateException(this, "Precpred(Context, 9)");
+						if (!(Precpred(Context, 10))) throw new FailedPredicateException(this, "Precpred(Context, 10)");
 						State = 126;
 						((SumarestaContext)_localctx).op = TokenStream.LT(1);
 						_la = TokenStream.LA(1);
-						if ( !(_la==T__12 || _la==T__13) ) {
+						if ( !(_la==T__11 || _la==T__12) ) {
 							((SumarestaContext)_localctx).op = ErrorHandler.RecoverInline(this);
 						}
 						else {
 							ErrorHandler.ReportMatch(this);
 						    Consume();
 						}
-						State = 127; expr(10);
+						State = 127; expr(11);
 						}
 						break;
 					case 3:
@@ -925,18 +925,18 @@ public partial class coolgrammarParser : Parser {
 						_localctx = new CompContext(new ExprContext(_parentctx, _parentState));
 						PushNewRecursionContext(_localctx, _startState, RULE_expr);
 						State = 128;
-						if (!(Precpred(Context, 8))) throw new FailedPredicateException(this, "Precpred(Context, 8)");
+						if (!(Precpred(Context, 9))) throw new FailedPredicateException(this, "Precpred(Context, 9)");
 						State = 129;
 						((CompContext)_localctx).op = TokenStream.LT(1);
 						_la = TokenStream.LA(1);
-						if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__14) | (1L << T__15) | (1L << T__16))) != 0)) ) {
+						if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__13) | (1L << T__14) | (1L << T__15))) != 0)) ) {
 							((CompContext)_localctx).op = ErrorHandler.RecoverInline(this);
 						}
 						else {
 							ErrorHandler.ReportMatch(this);
 						    Consume();
 						}
-						State = 130; expr(9);
+						State = 130; expr(10);
 						}
 						break;
 					case 4:
@@ -1022,7 +1022,7 @@ public partial class coolgrammarParser : Parser {
 				State = 152;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
-			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__1) | (1L << T__3) | (1L << T__9) | (1L << STR) | (1L << LET) | (1L << IF) | (1L << WHILE) | (1L << NEW) | (1L << ISVOID) | (1L << INTEGER) | (1L << TRUE) | (1L << FALSE) | (1L << NOT) | (1L << ID))) != 0) );
+			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__1) | (1L << T__3) | (1L << T__16) | (1L << STR) | (1L << LET) | (1L << IF) | (1L << WHILE) | (1L << NEW) | (1L << ISVOID) | (1L << INTEGER) | (1L << TRUE) | (1L << FALSE) | (1L << NOT) | (1L << ID))) != 0) );
 			}
 		}
 		catch (RecognitionException re) {
@@ -1129,7 +1129,7 @@ public partial class coolgrammarParser : Parser {
 			State = 172;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
-			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__1) | (1L << T__3) | (1L << T__9) | (1L << STR) | (1L << LET) | (1L << IF) | (1L << WHILE) | (1L << NEW) | (1L << ISVOID) | (1L << INTEGER) | (1L << TRUE) | (1L << FALSE) | (1L << NOT) | (1L << ID))) != 0)) {
+			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__1) | (1L << T__3) | (1L << T__16) | (1L << STR) | (1L << LET) | (1L << IF) | (1L << WHILE) | (1L << NEW) | (1L << ISVOID) | (1L << INTEGER) | (1L << TRUE) | (1L << FALSE) | (1L << NOT) | (1L << ID))) != 0)) {
 				{
 				State = 164; expr(0);
 				State = 169;
@@ -1170,9 +1170,9 @@ public partial class coolgrammarParser : Parser {
 	}
 	private bool expr_sempred(ExprContext _localctx, int predIndex) {
 		switch (predIndex) {
-		case 0: return Precpred(Context, 10);
-		case 1: return Precpred(Context, 9);
-		case 2: return Precpred(Context, 8);
+		case 0: return Precpred(Context, 11);
+		case 1: return Precpred(Context, 10);
+		case 2: return Precpred(Context, 9);
 		case 3: return Precpred(Context, 18);
 		}
 		return true;
@@ -1216,21 +1216,21 @@ public partial class coolgrammarParser : Parser {
 		'\f', '\v', '\xE', '\v', '\xAD', '\v', '\v', '\x5', '\v', '\xAF', '\n', 
 		'\v', '\x3', '\v', '\x2', '\x3', '\xE', '\f', '\x2', '\x4', '\x6', '\b', 
 		'\n', '\f', '\xE', '\x10', '\x12', '\x14', '\x2', '\a', '\x4', '\x2', 
-		'\f', '\f', '(', '(', '\x3', '\x2', '&', '\'', '\x3', '\x2', '\r', '\xE', 
-		'\x3', '\x2', '\xF', '\x10', '\x3', '\x2', '\x11', '\x13', '\x2', '\xC3', 
-		'\x2', '\x19', '\x3', '\x2', '\x2', '\x2', '\x4', '\x1D', '\x3', '\x2', 
-		'\x2', '\x2', '\x6', '\x30', '\x3', '\x2', '\x2', '\x2', '\b', '\x32', 
-		'\x3', '\x2', '\x2', '\x2', '\n', '<', '\x3', '\x2', '\x2', '\x2', '\f', 
-		'\x41', '\x3', '\x2', '\x2', '\x2', '\xE', 'z', '\x3', '\x2', '\x2', '\x2', 
-		'\x10', '\x98', '\x3', '\x2', '\x2', '\x2', '\x12', '\xA4', '\x3', '\x2', 
-		'\x2', '\x2', '\x14', '\xAE', '\x3', '\x2', '\x2', '\x2', '\x16', '\x17', 
-		'\x5', '\x4', '\x3', '\x2', '\x17', '\x18', '\a', '\x3', '\x2', '\x2', 
-		'\x18', '\x1A', '\x3', '\x2', '\x2', '\x2', '\x19', '\x16', '\x3', '\x2', 
-		'\x2', '\x2', '\x1A', '\x1B', '\x3', '\x2', '\x2', '\x2', '\x1B', '\x19', 
-		'\x3', '\x2', '\x2', '\x2', '\x1B', '\x1C', '\x3', '\x2', '\x2', '\x2', 
-		'\x1C', '\x3', '\x3', '\x2', '\x2', '\x2', '\x1D', '\x1E', '\a', '\x16', 
-		'\x2', '\x2', '\x1E', '!', '\a', '#', '\x2', '\x2', '\x1F', ' ', '\a', 
-		'\x17', '\x2', '\x2', ' ', '\"', '\a', '#', '\x2', '\x2', '!', '\x1F', 
+		'\x13', '\x13', '(', '(', '\x3', '\x2', '&', '\'', '\x3', '\x2', '\f', 
+		'\r', '\x3', '\x2', '\xE', '\xF', '\x3', '\x2', '\x10', '\x12', '\x2', 
+		'\xC3', '\x2', '\x19', '\x3', '\x2', '\x2', '\x2', '\x4', '\x1D', '\x3', 
+		'\x2', '\x2', '\x2', '\x6', '\x30', '\x3', '\x2', '\x2', '\x2', '\b', 
+		'\x32', '\x3', '\x2', '\x2', '\x2', '\n', '<', '\x3', '\x2', '\x2', '\x2', 
+		'\f', '\x41', '\x3', '\x2', '\x2', '\x2', '\xE', 'z', '\x3', '\x2', '\x2', 
+		'\x2', '\x10', '\x98', '\x3', '\x2', '\x2', '\x2', '\x12', '\xA4', '\x3', 
+		'\x2', '\x2', '\x2', '\x14', '\xAE', '\x3', '\x2', '\x2', '\x2', '\x16', 
+		'\x17', '\x5', '\x4', '\x3', '\x2', '\x17', '\x18', '\a', '\x3', '\x2', 
+		'\x2', '\x18', '\x1A', '\x3', '\x2', '\x2', '\x2', '\x19', '\x16', '\x3', 
+		'\x2', '\x2', '\x2', '\x1A', '\x1B', '\x3', '\x2', '\x2', '\x2', '\x1B', 
+		'\x19', '\x3', '\x2', '\x2', '\x2', '\x1B', '\x1C', '\x3', '\x2', '\x2', 
+		'\x2', '\x1C', '\x3', '\x3', '\x2', '\x2', '\x2', '\x1D', '\x1E', '\a', 
+		'\x16', '\x2', '\x2', '\x1E', '!', '\a', '#', '\x2', '\x2', '\x1F', ' ', 
+		'\a', '\x17', '\x2', '\x2', ' ', '\"', '\a', '#', '\x2', '\x2', '!', '\x1F', 
 		'\x3', '\x2', '\x2', '\x2', '!', '\"', '\x3', '\x2', '\x2', '\x2', '\"', 
 		'#', '\x3', '\x2', '\x2', '\x2', '#', ')', '\a', '\x4', '\x2', '\x2', 
 		'$', '%', '\x5', '\x6', '\x4', '\x2', '%', '&', '\a', '\x3', '\x2', '\x2', 
@@ -1267,7 +1267,7 @@ public partial class coolgrammarParser : Parser {
 		'\\', '{', '\x3', '\x2', '\x2', '\x2', ']', '^', '\a', '\"', '\x2', '\x2', 
 		'^', '{', '\a', '#', '\x2', '\x2', '_', '`', '\a', '$', '\x2', '\x2', 
 		'`', '{', '\x5', '\xE', '\b', '\xE', '\x61', '\x62', '\t', '\x2', '\x2', 
-		'\x2', '\x62', '{', '\x5', '\xE', '\b', '\r', '\x63', '\x64', '\a', '\x6', 
+		'\x2', '\x62', '{', '\x5', '\xE', '\b', '\n', '\x63', '\x64', '\a', '\x6', 
 		'\x2', '\x2', '\x64', '\x65', '\x5', '\xE', '\b', '\x2', '\x65', '\x66', 
 		'\a', '\a', '\x2', '\x2', '\x66', '{', '\x3', '\x2', '\x2', '\x2', 'g', 
 		'{', '\a', '%', '\x2', '\x2', 'h', '{', '\t', '\x3', '\x2', '\x2', 'i', 
@@ -1288,11 +1288,11 @@ public partial class coolgrammarParser : Parser {
 		'\x2', '\x2', 'z', 'i', '\x3', '\x2', '\x2', '\x2', 'z', 'j', '\x3', '\x2', 
 		'\x2', '\x2', 'z', 'm', '\x3', '\x2', '\x2', '\x2', 'z', 'y', '\x3', '\x2', 
 		'\x2', '\x2', '{', '\x92', '\x3', '\x2', '\x2', '\x2', '|', '}', '\f', 
-		'\f', '\x2', '\x2', '}', '~', '\t', '\x4', '\x2', '\x2', '~', '\x91', 
-		'\x5', '\xE', '\b', '\r', '\x7F', '\x80', '\f', '\v', '\x2', '\x2', '\x80', 
+		'\r', '\x2', '\x2', '}', '~', '\t', '\x4', '\x2', '\x2', '~', '\x91', 
+		'\x5', '\xE', '\b', '\xE', '\x7F', '\x80', '\f', '\f', '\x2', '\x2', '\x80', 
 		'\x81', '\t', '\x5', '\x2', '\x2', '\x81', '\x91', '\x5', '\xE', '\b', 
-		'\f', '\x82', '\x83', '\f', '\n', '\x2', '\x2', '\x83', '\x84', '\t', 
-		'\x6', '\x2', '\x2', '\x84', '\x91', '\x5', '\xE', '\b', '\v', '\x85', 
+		'\r', '\x82', '\x83', '\f', '\v', '\x2', '\x2', '\x83', '\x84', '\t', 
+		'\x6', '\x2', '\x2', '\x84', '\x91', '\x5', '\xE', '\b', '\f', '\x85', 
 		'\x88', '\f', '\x14', '\x2', '\x2', '\x86', '\x87', '\a', '\n', '\x2', 
 		'\x2', '\x87', '\x89', '\a', '#', '\x2', '\x2', '\x88', '\x86', '\x3', 
 		'\x2', '\x2', '\x2', '\x88', '\x89', '\x3', '\x2', '\x2', '\x2', '\x89', 
