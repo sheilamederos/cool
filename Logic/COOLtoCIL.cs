@@ -112,13 +112,12 @@ namespace Logic
 
     public class GET_CIL_AST
     {
-        public static void CIL_Program(Program node)
+        public static CIL_Program CIL(Program node)
         {
-            //var comp = new CoolToCil();
-            //comp.Visit(node);
-            //List<CIL_Function> code = new List<CIL_Function>(comp.Code.Select(x => x.Value));
-            //return new CIL_Program(new CIL_Code(code),new CIL_Data(comp.Data),new CIL_Types(comp.Types));
-
+            var comp = new CoolToCil();
+            comp.Visit(node);
+            List<CIL_Function> code = new List<CIL_Function>(comp.Code.Select(x => x.Value));
+            return new CIL_Program(new CIL_Code(code), new CIL_Data(comp.Data), new CIL_Types(comp.Types));
         }
     }
 
@@ -171,7 +170,7 @@ namespace Logic
                     mtds.Add(new Tuple<string, string>(mtd.Name, mtd_name));
                 }
 
-                Types[key] = new CIL_OneType(attrs, mtds);
+                Types[key] = new CIL_OneType(key, attrs, mtds);
             }
 
             foreach (var item in node.list)
@@ -195,7 +194,7 @@ namespace Logic
         {
             method = new Current_Method();
             string solution = Visit(node.exp);
-            method.Add_Instruction(new CIL_Return("ret", solution));
+            method.Add_Instruction(new CIL_Return(solution));
             Code.Add(node.name.name, new CIL_Function(node.name.name, new List<string>(node.args.list_Node.Select(x => x.name.name)), new List<string>(method.locals.Values), method.body));
             return "";
         }
@@ -312,7 +311,7 @@ namespace Logic
             var ret = method.Add_local("ret_if", true);
             var begin_if = method.Take_var("begin_if");
             var end_if = method.Take_var("end_if");
-            method.Add_Instruction(new CIL_If(cond, begin_if));
+            method.Add_Instruction(new CIL_ConditionalJump(cond, begin_if));
 
             if (node.elsse != null)
             {
@@ -336,7 +335,7 @@ namespace Logic
             var cond = Visit(node.exp1);
             var body = Visit(node.exp2);
             method.Add_Instruction(new CIL_Label(begin_while));
-            method.Add_Instruction(new CIL_If(cond, body_while));
+            method.Add_Instruction(new CIL_ConditionalJump (cond, body_while));
             method.Add_Instruction(new CIL_Goto(end_while));
             method.Add_Instruction(new CIL_Label(body_while));
             method.Add_Instruction(new CIL_Assig(ret, body));
