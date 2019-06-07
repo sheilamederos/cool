@@ -27,14 +27,14 @@ namespace Logic
         public Scope father;
         public string id;
         Take_str take;
-        Dictionary<string, string> dic;
+        Dictionary<string, string> locals;
 
         public Scope(string id, Scope father = null)
         {
             this.id = id;
             this.father = father;
             take = new Take_str(id);
-            dic = new Dictionary<string, string>();
+            locals = new Dictionary<string, string>();
         }
 
         public string Var(string id = "")
@@ -50,14 +50,14 @@ namespace Logic
 
         public string Get_var(string key)
         {
-            if (dic.ContainsKey(key)) return dic[key];
+            if (locals.ContainsKey(key)) return locals[key];
             if (father == null) return null;
             return father.Get_var(key);
         }
 
         public void Add_var(string key, string value)
         {
-            dic.Add(key, value);
+            locals.Add(key, value);
         }
     }
 
@@ -136,6 +136,7 @@ namespace Logic
         public CoolToCil()
         {
             method = new Current_Method();
+            take_data = new Take_str("data");
             Data = new Dictionary<string, string>();
             Code = new Dictionary<string, CIL_Function>();
             Types = new Dictionary<string, CIL_OneType>();

@@ -122,40 +122,15 @@ namespace CIL
 
         public override void Accept(IVisitor visitor) => visitor.Accept(this);
     }
-
-    public class CIL_MyVar : CIL_Instruction
-    {
-        public string Name { get; }
-        public int Id { get; }
-
-        public CIL_MyVar(string name, int id)
-        {
-            Name = name;
-            Id = id;
-        }
-
-        public override void Accept(IVisitor visitor) => visitor.Accept(this);
-    }
-
-    public class CIL_MyCons : CIL_Instruction
-    {
-        public int Value { get; }
-
-        public CIL_MyCons(int value)
-        {
-            Value = value;
-        }
-
-        public override void Accept(IVisitor visitor) => visitor.Accept(this);
-    }
+    
 
     public class CIL_Concat : CIL_Instruction
     {
-        public CIL_MyVar Dest;
-        public CIL_MyVar Var1;
-        public CIL_MyVar Var2;
+        public string Dest;
+        public string Var1;
+        public string Var2;
 
-        public CIL_Concat(CIL_MyVar dest, CIL_MyVar var1, CIL_MyVar var2)
+        public CIL_Concat(string dest, string var1, string var2)
         {
             Dest = dest;
             Var1 = var1;
@@ -168,10 +143,10 @@ namespace CIL
     public class CIL_Substring : CIL_Instruction
     {
         public string Dest;
-        public CIL_MyVar Var1;
-        public CIL_MyVar Var2;
+        public string Var1;
+        public string Var2;
 
-        public CIL_Substring(string dest, CIL_MyVar var1, CIL_MyVar var2)
+        public CIL_Substring(string dest, string var1, string var2)
         {
             Dest = dest;
             Var1 = var1;
@@ -325,9 +300,9 @@ namespace CIL
     public class CIL_Length : CIL_Instruction
     {
         public string Dest;
-        public CIL_MyVar Msg;
+        public string Msg;
 
-        public CIL_Length(string dest, CIL_MyVar msg)
+        public CIL_Length(string dest, string msg)
         {
             Dest = dest;
             Msg = msg;
@@ -402,9 +377,9 @@ namespace CIL
 
     public class CIL_Read : CIL_Instruction
     {
-        public CIL_MyVar _var;
+        public string _var;
 
-        public CIL_Read(CIL_MyVar myVar)
+        public CIL_Read(string myVar)
         {
             _var = myVar;
         }
@@ -414,9 +389,9 @@ namespace CIL
 
     public class CIL_Print : CIL_Instruction
     {
-        public CIL_MyVar _var;
+        public string _var;
 
-        public CIL_Print(CIL_MyVar myVar)
+        public CIL_Print(string myVar)
         {
             _var = myVar;
         }
