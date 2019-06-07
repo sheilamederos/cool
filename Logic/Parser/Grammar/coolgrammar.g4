@@ -25,9 +25,9 @@ expr    : expr ('@' TYPE)? '.' ID '(' args_call ')'								# dispatch
 		| expr op = ('*' | '/') expr					                        # multdiv
         | expr op = ('+' | '-') expr 				                            # sumaresta
         | expr op = ('<' | '<=' | '=') expr				                        # comp
+		| ID											                        # id
         | op = ( NOT | '~' ) expr						                        # unary_exp
         | '(' expr ')'									                        # parentesis
-		| ID											                        # id
 		| INTEGER										                        # int
 		| cons = (TRUE | FALSE)						                            # bool
 		| STR																	# string

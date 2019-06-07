@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from c:\users\ale\documents\visual studio 2017\projects\compiler\logic\parser\grammar\coolgrammar.g4 by ANTLR 4.7.1
+// Generated from C:\Users\Ale\Desktop\Proyecto\Compiler\Logic\Parser\Grammar\coolgrammar.g4 by ANTLR 4.7.1
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -766,10 +766,18 @@ public partial class coolgrammarParser : Parser {
 				break;
 			case 7:
 				{
+				_localctx = new IdContext(_localctx);
+				Context = _localctx;
+				_prevctx = _localctx;
+				State = 95; Match(ID);
+				}
+				break;
+			case 8:
+				{
 				_localctx = new Unary_expContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 95;
+				State = 96;
 				((Unary_expContext)_localctx).op = TokenStream.LT(1);
 				_la = TokenStream.LA(1);
 				if ( !(_la==T__16 || _la==NOT) ) {
@@ -779,25 +787,17 @@ public partial class coolgrammarParser : Parser {
 					ErrorHandler.ReportMatch(this);
 				    Consume();
 				}
-				State = 96; expr(8);
-				}
-				break;
-			case 8:
-				{
-				_localctx = new ParentesisContext(_localctx);
-				Context = _localctx;
-				_prevctx = _localctx;
-				State = 97; Match(T__3);
-				State = 98; expr(0);
-				State = 99; Match(T__4);
+				State = 97; expr(7);
 				}
 				break;
 			case 9:
 				{
-				_localctx = new IdContext(_localctx);
+				_localctx = new ParentesisContext(_localctx);
 				Context = _localctx;
 				_prevctx = _localctx;
-				State = 101; Match(ID);
+				State = 98; Match(T__3);
+				State = 99; expr(0);
+				State = 100; Match(T__4);
 				}
 				break;
 			case 10:
@@ -1266,11 +1266,11 @@ public partial class coolgrammarParser : Parser {
 		'Z', '[', '\x5', '\x10', '\t', '\x2', '[', '\\', '\a', '\x5', '\x2', '\x2', 
 		'\\', '{', '\x3', '\x2', '\x2', '\x2', ']', '^', '\a', '\"', '\x2', '\x2', 
 		'^', '{', '\a', '#', '\x2', '\x2', '_', '`', '\a', '$', '\x2', '\x2', 
-		'`', '{', '\x5', '\xE', '\b', '\xE', '\x61', '\x62', '\t', '\x2', '\x2', 
-		'\x2', '\x62', '{', '\x5', '\xE', '\b', '\n', '\x63', '\x64', '\a', '\x6', 
-		'\x2', '\x2', '\x64', '\x65', '\x5', '\xE', '\b', '\x2', '\x65', '\x66', 
-		'\a', '\a', '\x2', '\x2', '\x66', '{', '\x3', '\x2', '\x2', '\x2', 'g', 
-		'{', '\a', ')', '\x2', '\x2', 'h', '{', '\a', '%', '\x2', '\x2', 'i', 
+		'`', '{', '\x5', '\xE', '\b', '\xE', '\x61', '{', '\a', ')', '\x2', '\x2', 
+		'\x62', '\x63', '\t', '\x2', '\x2', '\x2', '\x63', '{', '\x5', '\xE', 
+		'\b', '\t', '\x64', '\x65', '\a', '\x6', '\x2', '\x2', '\x65', '\x66', 
+		'\x5', '\xE', '\b', '\x2', '\x66', 'g', '\a', '\a', '\x2', '\x2', 'g', 
+		'{', '\x3', '\x2', '\x2', '\x2', 'h', '{', '\a', '%', '\x2', '\x2', 'i', 
 		'{', '\t', '\x3', '\x2', '\x2', 'j', '{', '\a', '\x15', '\x2', '\x2', 
 		'k', 'l', '\a', ')', '\x2', '\x2', 'l', 'm', '\a', '\t', '\x2', '\x2', 
 		'm', '{', '\x5', '\xE', '\b', '\x4', 'n', 'o', '\a', '\x18', '\x2', '\x2', 
@@ -1283,12 +1283,12 @@ public partial class coolgrammarParser : Parser {
 		'z', '\x45', '\x3', '\x2', '\x2', '\x2', 'z', 'K', '\x3', '\x2', '\x2', 
 		'\x2', 'z', 'S', '\x3', '\x2', '\x2', '\x2', 'z', 'Y', '\x3', '\x2', '\x2', 
 		'\x2', 'z', ']', '\x3', '\x2', '\x2', '\x2', 'z', '_', '\x3', '\x2', '\x2', 
-		'\x2', 'z', '\x61', '\x3', '\x2', '\x2', '\x2', 'z', '\x63', '\x3', '\x2', 
-		'\x2', '\x2', 'z', 'g', '\x3', '\x2', '\x2', '\x2', 'z', 'h', '\x3', '\x2', 
-		'\x2', '\x2', 'z', 'i', '\x3', '\x2', '\x2', '\x2', 'z', 'j', '\x3', '\x2', 
-		'\x2', '\x2', 'z', 'k', '\x3', '\x2', '\x2', '\x2', 'z', 'n', '\x3', '\x2', 
-		'\x2', '\x2', '{', '\x92', '\x3', '\x2', '\x2', '\x2', '|', '}', '\f', 
-		'\r', '\x2', '\x2', '}', '~', '\t', '\x4', '\x2', '\x2', '~', '\x91', 
+		'\x2', 'z', '\x61', '\x3', '\x2', '\x2', '\x2', 'z', '\x62', '\x3', '\x2', 
+		'\x2', '\x2', 'z', '\x64', '\x3', '\x2', '\x2', '\x2', 'z', 'h', '\x3', 
+		'\x2', '\x2', '\x2', 'z', 'i', '\x3', '\x2', '\x2', '\x2', 'z', 'j', '\x3', 
+		'\x2', '\x2', '\x2', 'z', 'k', '\x3', '\x2', '\x2', '\x2', 'z', 'n', '\x3', 
+		'\x2', '\x2', '\x2', '{', '\x92', '\x3', '\x2', '\x2', '\x2', '|', '}', 
+		'\f', '\r', '\x2', '\x2', '}', '~', '\t', '\x4', '\x2', '\x2', '~', '\x91', 
 		'\x5', '\xE', '\b', '\xE', '\x7F', '\x80', '\f', '\f', '\x2', '\x2', '\x80', 
 		'\x81', '\t', '\x5', '\x2', '\x2', '\x81', '\x91', '\x5', '\xE', '\b', 
 		'\r', '\x82', '\x83', '\f', '\v', '\x2', '\x2', '\x83', '\x84', '\t', 

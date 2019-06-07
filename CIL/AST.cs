@@ -43,9 +43,9 @@ namespace CIL
     {
         public Dictionary<string, CIL_OneType> _types { get; }
 
-        public CIL_Types()
+        public CIL_Types(Dictionary<string, CIL_OneType> types)
         {
-            _types = new Dictionary<string, CIL_OneType>();
+            _types = types;
         }
 
         public override void Accept(IVisitor visitor) => visitor.Accept(this);
@@ -53,16 +53,11 @@ namespace CIL
 
     public class CIL_Data : CIL_Node
     {
-        public List<Tuple<string, string>> _stringVars { get; }
+        public Dictionary<string, string> _stringVars;
 
-        public CIL_Data()
+        public CIL_Data(Dictionary<string, string> vars)
         {
-            _stringVars = new List<Tuple<string, string>>();
-        }
-
-        public void AddStringVar(string name, string value)
-        {
-            _stringVars.Add(new Tuple<string, string>(name, value));
+            _stringVars = vars;
         }
 
         public override void Accept(IVisitor visitor) => visitor.Accept(this);
@@ -96,9 +91,9 @@ namespace CIL
     {
         public List<CIL_Function> Funcs;
 
-        public CIL_Code()
+        public CIL_Code(List<CIL_Function> funcs)
         {
-            Funcs = new List<CIL_Function>();
+            Funcs = funcs;
         }
 
         public void AddFunc(CIL_Function func)
@@ -408,18 +403,6 @@ namespace CIL
         {
             ConditionVar = conditionVar;
             Label = label;
-        }
-
-        public override void Accept(IVisitor visitor) => visitor.Accept(this);
-    }
-
-    public class CIL_Arg : CIL_Instruction
-    {
-        public string name;
-
-        public CIL_Arg(string n)
-        {
-            name = n;
         }
 
         public override void Accept(IVisitor visitor) => visitor.Accept(this);

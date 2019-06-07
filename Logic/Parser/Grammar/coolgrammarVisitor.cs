@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from c:\users\ale\documents\visual studio 2017\projects\compiler\logic\parser\grammar\coolgrammar.g4 by ANTLR 4.7.1
+// Generated from C:\Users\Ale\Desktop\Proyecto\Compiler\Logic\Parser\Grammar\coolgrammar.g4 by ANTLR 4.7.1
 
 // Unreachable code detected
 #pragma warning disable 0162
