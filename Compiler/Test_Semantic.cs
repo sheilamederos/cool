@@ -17,34 +17,34 @@ namespace Compiler
             StreamReader x = new StreamReader("a.txt");
             string text = x.ReadToEnd();
 
-            Debug_Semantic_Files_Success();
+            //Debug_Semantic_Files_Success();
 
-            //AST.Program ast = (AST.Program)GetAST.Show(text);
-            //Program.DFS(ast);
+            AST.Program ast = (AST.Program)GetAST.Show(text);
+            Program.DFS(ast);
 
-            //var DefChecker = new DefinitionsChecker();
-            //bool check = DefChecker.Visit(ast);
-            //Console.WriteLine(DefChecker.Logger);
-            //if (check)
-            //{
-            //    Console.WriteLine("Definiciones OK");
-            //    Dictionary<string, IType> types = IType.GetAllTypes(ast);
-            //    ContextType context = new ContextType(types);
-            //    var SymChecker = new SymCheckerVisitor(context);
-            //    bool check_sym = SymChecker.Visit(ast);
-            //    Console.WriteLine(SymChecker.Logger);
+            var DefChecker = new DefinitionsChecker();
+            bool check = DefChecker.Visit(ast);
+            Console.WriteLine(DefChecker.Logger);
+            if (check)
+            {
+                Console.WriteLine("Definiciones OK");
+                Dictionary<string, IType> types = IType.GetAllTypes(ast);
+                ContextType context = new ContextType(types);
+                var SymChecker = new SymCheckerVisitor(context);
+                bool check_sym = SymChecker.Visit(ast);
+                Console.WriteLine(SymChecker.Logger);
 
-            //    if (check_sym)
-            //    {
-            //        Console.WriteLine("Simbolos OK");
-            //        context = new ContextType(types);
-            //        var TypeCheck = new TypeCheckerVisitor(context);
-            //        TypeCheck.Visit(ast);
-            //        Console.WriteLine(TypeCheck.Logger);
-            //    }
-            //    else Console.WriteLine("Simbolos al berro");
-            //}
-            //else Console.WriteLine("Definiciones al berro");
+                if (check_sym)
+                {
+                    Console.WriteLine("Simbolos OK");
+                    context = new ContextType(types);
+                    var TypeCheck = new TypeCheckerVisitor(context);
+                    TypeCheck.Visit(ast);
+                    Console.WriteLine(TypeCheck.Logger);
+                }
+                else Console.WriteLine("Simbolos al berro");
+            }
+            else Console.WriteLine("Definiciones al berro");
         }
 
         public static void Debug_Semantic_Files_Success()
