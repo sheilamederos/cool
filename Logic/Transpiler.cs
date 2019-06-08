@@ -28,7 +28,7 @@ namespace Logic
     {
         public override Node VisitAssign([NotNull] coolgrammarParser.AssignContext context)
         {
-            string id = context.ID().GetText();
+            Id id = (Id)Visit(context.ID());
             Expr r = (Expr)Visit(context.expr());
             return new Assign(id, r);
         }
@@ -88,6 +88,120 @@ namespace Logic
             }
             return new Program(clases);
         }
-        
+        public override Node VisitClass([NotNull] coolgrammarParser.ClassContext context)
+        {
+            List<Method_Def> met = new List<Method_Def>();
+            List<Attr_Def> attr = new List<Attr_Def>();
+            foreach (var item in context.feature())
+            {
+                var v = Visit(item);
+                if (v is Method_Def) met.Add((Method_Def)v);
+                else attr.Add((Attr_Def)v);
+            }
+
+            string father;
+            if (context.TYPE().Length > 1) father = context.TYPE(1).GetText();
+            else father = "object";
+
+            return new Class_Def(new Type_cool(context.TYPE(0).GetText()), new Type_cool(father), new Lista<Method_Def>(met), new Lista<Attr_Def>(attr));
+        }
+
+        public override Node VisitF_method([NotNull] coolgrammarParser.F_methodContext context)
+        {
+            return Visit(context.method());
+        }
+
+        public override Node VisitF_attr([NotNull] coolgrammarParser.F_attrContext context)
+        {
+            return Visit(context.attr());
+        }
+
+        public override Node VisitMethod([NotNull] coolgrammarParser.MethodContext context)
+        {
+            List<Formal> args = new List<Formal>();
+            foreach (var item in context.args_def().formal())
+            {
+                var v = Visit(item);
+                args.Add((Formal)v);
+            }
+            Expr exp = (Expr)Visit(context.expr());
+            return new Method_Def(new Id(context.ID().GetText()), new Type_cool(context.TYPE().GetText()), new Lista<Formal>(args), exp);
+        }
+
+        public override Node VisitAttr([NotNull] coolgrammarParser.AttrContext context)
+        {
+            var a = (Formal)Visit(context.formal());
+            var exp = (Expr)Visit(context.expr());
+            return new Attr_Def(a.name, a.type, exp);
+        }
+
+        public override Node VisitFormal([NotNull] coolgrammarParser.FormalContext context)
+        {
+            return new Formal(new Id(context.ID().GetText()), new Type_cool(context.TYPE().GetText()));
+        }
+
+        public override Node VisitCall_method([NotNull] coolgrammarParser.Call_methodContext context)
+        {
+            var list = new List<Expr>();
+            foreach (var item in context.args_call().expr())
+            {
+                var v = Visit(item);
+                list.Add((Expr)v);
+            }
+            return new Call_Method(new Id(context.ID().GetText()), new Lista<Expr>(list));
+        }
+
+        public override Node VisitLet([NotNull] coolgrammarParser.LetContext context)
+        {
+            List<Attr_Def> list = new List<Attr_Def>();
+            Expr exp = (Expr)Visit(context.expr());
+
+            foreach (var item in context.attr())
+            {
+                var v = (Attr_Def)Visit(item);
+                list.Add(v);
+            }
+
+            return new Let_In(new Lista<Attr_Def>(list), exp);
+        }
+
+        public override Node VisitIf([NotNull] coolgrammarParser.IfContext context)
+        {
+            Expr exp1 = (Expr)Visit(context.expr(0));
+            Expr exp2 = (Expr)Visit(context.expr(1));
+            Expr exp3 = (Expr)Visit(context.expr(2));
+
+            return new If_Else(exp1, exp2, exp3);
+        }
+
+        public override Node VisitWhile([NotNull] coolgrammarParser.WhileContext context)
+        {
+            Expr exp1 = (Expr)Visit(context.expr(0));
+            Expr exp2 = (Expr)Visit(context.expr(1));
+            return new While_loop(exp1, exp2);
+        }
+
+        public override Node VisitBody([NotNull] coolgrammarParser.BodyContext context)
+        {
+            List<Expr> list = new List<Expr>();
+            foreach (var item in context.expr_list().expr())
+            {
+                var v = (Expr)Visit(item);
+                list.Add(v);
+            }
+            return new Body(new Lista<Expr>(list));
+        }
+
+        public override Node VisitNew_type([NotNull] coolgrammarParser.New_typeContext context)
+        {
+            return new New_type(new Type_cool(context.TYPE().GetText()));
+        }
+
+        public override Node VisitIsvoid([NotNull] coolgrammarParser.IsvoidContext context)
+        {
+            Expr exp = (Expr)Visit(context.expr());
+            return new IsVoid(exp);
+        }
+
     }
 }

@@ -3,7 +3,7 @@ grammar coolgrammar;
 
 program : (class ';')+ ;
 
-class	: CLASS TYPE ( INHERITS TYPE)* '{' (feature ';')* '}' ;
+class	: CLASS TYPE ( INHERITS TYPE)? '{' (feature ';')* '}' ;
 
 feature : method																# f_method
 		| attr																	# f_attr
@@ -52,10 +52,10 @@ WHILE : 'while';
 LOOP : 'loop';
 POOL : 'pool';
 NEW : 'new';
-TYPE : 'type';
+TYPE : [A-Z][_0-9A-Za-z]*;
 ISVOID : 'isvoid';
 INTEGER : [0-9]+;
-ID : [a-z]+;
+ID : [A-Z][_0-9A-Za-z]*;
 TRUE : 'true';
 FALSE : 'false';
 NOT : 'not';

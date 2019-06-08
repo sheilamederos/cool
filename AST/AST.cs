@@ -46,19 +46,26 @@ namespace AST
             list_Node = list;
         }
 
-        public override T Visit<T>(IVisitorAST<T> visitor) => visitor.Visit(this);
+        public override Q Visit<Q>(IVisitorAST<Q> visitor) => visitor.Visit(this);
+
+        public override string ToString()
+        {
+            return "Lista de" ; 
+        }
 
 
     }
 
     public class Class_Def : Node
     {
-        public Id name;
+        Type_cool type;
+        Type_cool inherit_type;
         public Lista<Method_Def> method;
         public Lista<Attr_Def> attr;
-        public Class_Def(Id n, Lista<Method_Def> m, Lista<Attr_Def> a) : base(new Node[] { n, m, a })
+        public Class_Def(Type_cool t, Type_cool t1, Lista<Method_Def> m, Lista<Attr_Def> a) : base(new Node[] { m, a })
         {
-            name = n;
+            type = t;
+            inherit_type = t1;
             method = m;
             attr = a;
         }
@@ -67,7 +74,7 @@ namespace AST
 
         public override string ToString()
         {
-            return "clase: " + name;
+            return "clase: " + type + " padre: " + inherit_type;
         }
     }
 
@@ -76,11 +83,13 @@ namespace AST
         public Id name;
         public Type_cool type;
         public Lista<Formal> args;
-        public Method_Def(Id n, Type_cool t, Lista<Formal> a) : base ( new Node[] { n, t, a })
+        public Expr exp;
+        public Method_Def(Id n, Type_cool t, Lista<Formal> a, Expr e) : base ( new Node[] { n, t, a, e })
         {
             name = n;
             type = t;
             args = a;
+            exp = e;
         }
 
         public override T Visit<T>(IVisitorAST<T> visitor) => visitor.Visit(this);
@@ -147,7 +156,8 @@ namespace AST
 
     public class Expr : Node
     {
-        public string type { get; set; }
+        public Type_cool type { get; set; }
+
         public Expr(IEnumerable<Node> children) : base (children)
         {
         }
@@ -159,6 +169,125 @@ namespace AST
             return "Expr";
         }
     }
+
+    public class Call_Method : Expr
+    {
+        public Id name;
+        public Lista<Expr> args;
+        public Call_Method(Id n, Lista<Expr> args) : base (new Node[] { n,args })
+        {
+            name = n;
+            this.args = args;
+        }
+
+        public override T Visit<T>(IVisitorAST<T> visitor) => visitor.Visit(this);
+
+        public override string ToString()
+        {
+            return "Call_Method: " + name;
+        }
+    }
+
+    public class Let_In : Expr
+    {
+        public Lista<Attr_Def> attrs;
+        public Expr exp;
+        public Let_In(Lista<Attr_Def> a, Expr exp) :base (new Node[] { a, exp})
+        {
+            attrs = a;
+            this.exp = exp;
+        }
+
+        public override T Visit<T>(IVisitorAST<T> visitor) => visitor.Visit(this);
+
+        public override string ToString()
+        {
+            return "Let_In: " ;
+        }
+
+    }
+
+    public class If_Else : Expr
+    {
+        Expr exp1, exp2, exp3;
+        public If_Else(Expr e1, Expr e2, Expr e3) : base(new Node[] { e1, e2, e3 })
+        {
+            exp1 = e1;
+            exp2 = e2;
+            exp3 = e3;
+        }
+        public override T Visit<T>(IVisitorAST<T> visitor) => visitor.Visit(this);
+
+        public override string ToString()
+        {
+            return "If: " + exp1.ToString() + " Then: " + exp2.ToString() + " Else: " + exp3.ToString();
+        }
+    }
+
+    public class While_loop : Expr
+    {
+        Expr exp1, exp2;
+        public While_loop(Expr e1, Expr e2) : base(new Node[] { e1, e2 })
+        {
+            exp1 = e1;
+            exp2 = e2;
+        }
+        public override T Visit<T>(IVisitorAST<T> visitor) => visitor.Visit(this);
+
+        public override string ToString()
+        {
+            return "While";
+        }
+    }
+
+    public class Body : Expr
+    {
+        Lista<Expr> list;
+        public Body(Lista<Expr> l) : base(new Node[] {l})
+        {
+            list = l;
+        }
+
+        public override T Visit<T>(IVisitorAST<T> visitor) => visitor.Visit(this);
+
+        public override string ToString()
+        {
+            return "Body";
+        }
+    }
+
+    public class New_type : Expr
+    {
+        public New_type(Type_cool t) : base (new Node[] { t})
+        {
+            this.type = t;
+        }
+
+        public override T Visit<T>(IVisitorAST<T> visitor) => visitor.Visit(this);
+
+        public override string ToString()
+        {
+            return "New_type";
+        }
+
+    }
+
+    public class IsVoid : Expr
+    {
+        Expr exp;
+        public IsVoid(Expr e) : base (new Node[] { e})
+        {
+            exp = e;
+        }
+
+        public override T Visit<T>(IVisitorAST<T> visitor) => visitor.Visit(this);
+
+        public override string ToString()
+        {
+            return "IsVoid";
+        }
+    }
+
     public class BinaryExpr : Expr
     {
         public Expr left, right;
@@ -195,9 +324,9 @@ namespace AST
 
     public class Assign : Expr
     {
-        public string id;
+        public Id id;
         public Expr exp;
-        public Assign(string id, Expr exp) : base (new Node[] { exp})
+        public Assign(Id id, Expr exp) : base (new Node[] { exp})
         {
             this.id = id;
             this.exp = exp;
@@ -207,7 +336,7 @@ namespace AST
 
         public override string ToString()
         {
-            return id + ' ' + "<-"+ ' ' + exp.ToString();
+            return id.name + ' ' + "<-"+ ' ' + exp.ToString();
         }
     }
 

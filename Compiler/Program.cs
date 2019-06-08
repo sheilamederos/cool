@@ -32,8 +32,31 @@ namespace Compiler
         static void Main(string[] args)
         {
             string text = @" 
-                             z <- x <= y + 1 - 1/1;  ";
+                    class Sheila inherits Persona
+                    {
+                        Edad : int <- 22;
+                        Mujer : bool <- true;
+                        Novio : Persona <- new Persona;
+                        i : INT <- 10;
+
+                        metodo1() : int {{while i > 0 loop i <- i - 1 pool; i; }};
+
+                        metodo2() : int { let a : int <- 3, b : int <- 5 in a * b; };
+
+                        metodo4() : bool { not true; };
+                    }; ";
             DFS(GetAST.Show(text));
+            /* Edad <- 22;
+                        Mujer <- true;
+                        Novio: Persona <- new Persona;
+
+                        i <- 10;
+                        metodo1() : int {{while i > 0 loop i <- i - 1 pool; i; }};
+
+                        metodo2() : int{ let a : int <- 3, b : int <- 5 in a * b; };
+
+
+                        metodo4() : bool { not true; };*/
         }
     }
 }
