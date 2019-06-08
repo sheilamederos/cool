@@ -44,12 +44,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CheckSemantic\Contexts.cs" />
+    <Compile Include="CheckSemantic\VarChecker.cs" />
     <Compile Include="Transpiler.cs" />
     <Compile Include="Parser\Grammar\coolgrammarBaseVisitor.cs" />
     <Compile Include="Parser\Grammar\coolgrammarLexer.cs" />
     <Compile Include="Parser\Grammar\coolgrammarParser.cs" />
     <Compile Include="Parser\Grammar\coolgrammarVisitor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="CheckSemantic\TypeChecker.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Parser\Grammar\coolgrammar.g4" />
