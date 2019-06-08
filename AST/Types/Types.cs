@@ -124,16 +124,11 @@ namespace AST.Types
 
     public class ComposeType : IType
     {
-        object DefaultValue;
-
-        public ComposeType(string name, IType father, object def) : base(name, father)
-        {
-            DefaultValue = def;
-        }
+        public ComposeType(string name, IType father) : base(name, father) { }
 
         public override TypeValue Default()
         {
-            return new TypeValue(this, DefaultValue);
+            return new TypeValue(this, null);
         }
     }
 

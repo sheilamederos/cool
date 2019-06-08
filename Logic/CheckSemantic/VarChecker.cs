@@ -9,7 +9,7 @@ namespace Logic.CheckSemantic
 {
     public class VarCheckerVisitor : IVisitorAST<bool>
     {
-        ContextType Context;
+        ContextType Context; //tipos, metodos, atributos
 
         public VarCheckerVisitor(ContextType context)
         {
@@ -32,17 +32,21 @@ namespace Logic.CheckSemantic
 
         public bool Visit(Expr node)
         {
-            throw new NotImplementedException();
+            foreach (Node cld in node.children)
+            {
+                return true;
+            }
+            return false;
         }
 
         public bool Visit(BinaryExpr node)
         {
-            throw new NotImplementedException();
+            return this.Visit(node.left) && this.Visit(node.right);
         }
 
         public bool Visit(UnaryExpr node)
         {
-            throw new NotImplementedException();
+            return this.Visit(node.exp);
         }
 
         public bool Visit(Assign node)

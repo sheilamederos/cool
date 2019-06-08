@@ -14,7 +14,7 @@ namespace Logic.CheckSemantic
         IType GetTypeFor(string symbol);
         IContext CreateChildContext();
         bool DefineSymbol(string symbol, IType type);
-        IType CreateType(string name, IType father, TypeValue def);
+        IType CreateType(string name, IType father);
     }
 
     public class ContextType : IContext
@@ -37,9 +37,9 @@ namespace Logic.CheckSemantic
             return new ContextType(this);
         }
 
-        public IType CreateType(string name, IType father, TypeValue def)
+        public IType CreateType(string name, IType father)
         {
-            IType type = new ComposeType(name, father, def);
+            IType type = new ComposeType(name, father);
 
             Types.Add(type);
 
