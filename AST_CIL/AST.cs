@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 
 namespace AST_CIL
 {
-    public class OneType
+    public abstract class Node
+    {
+        public virtual void Accept(IVisitor visitor) => visitor.Visit(this);
+    }
+    
+    public class OneType : Node
     {
         public List<string> Attributes;
         public List<Tuple<string, string>> Methods;
@@ -14,9 +18,11 @@ namespace AST_CIL
             Attributes = attributes;
             Methods = methods;
         }
+        
+        public override void Accept(IVisitor visitor) => visitor.Visit(this);
     }
     
-    public class Types
+    public class Types : Node
     {
         public Dictionary<string, OneType> _types { get; }
 
@@ -24,9 +30,11 @@ namespace AST_CIL
         {
             _types = new Dictionary<string, OneType>();
         }
+        
+        public override void Accept(IVisitor visitor) => visitor.Visit(this);
     }
 
-    public class Data
+    public class Data : Node
     {
         public List<Tuple<string, string>> _stringVars { get; }
         public List<Tuple<string, int>> _integerVars { get; }
@@ -46,14 +54,18 @@ namespace AST_CIL
         {
             _stringVars.Add(new Tuple<string, string>(name, value));
         }
+        
+        public override void Accept(IVisitor visitor) => visitor.Visit(this);
     }
 
-    public class Instruction
-    {}
-    
-    public class Function
+    public abstract class Instruction : Node
     {
-        public List<int> Args; // preguntar sobre el tipo de los argumentos,aqui asumo que solo son enteros
+        public override void Accept(IVisitor visitor) => visitor.Visit(this);
+    }
+    
+    public class Function : Node
+    {
+        public List<int> Args; // asumo que solo son enteros
         public List<string> Locals;
         public List<Instruction> Instructions;
 
@@ -73,9 +85,11 @@ namespace AST_CIL
         {
             Instructions.Add(ins);
         }
+        
+        public override void Accept(IVisitor visitor) => visitor.Visit(this);
     }
 
-    public class Code
+    public class Code : Node
     {
         public List<Function> Funcs;
 
@@ -88,32 +102,28 @@ namespace AST_CIL
         {
             Funcs.Add(func);
         }
+        
+        public override void Accept(IVisitor visitor) => visitor.Visit(this);
     }
 
-    public class Assig : Instruction // OJO: las asignaciones solo van a ser con constantes
+    public class Assig : Instruction
     {
-        private bool _constant = false;
-        public bool Constant => _constant;
+        public string Dest;
+        public Atom RigthMem;
 
-        public readonly string IzqMem;
-        public readonly int DerMemCons;
-        public string DerMemVar;
-
-        public Assig(string izqMem, int derMem)
+        public Assig(string dest, Atom rigthMem)
         {
-            _constant = true;
-            IzqMem = izqMem;
-            DerMemCons = derMem;
+            Dest = dest;
+            RigthMem = RigthMem;
         }
-
-        public Assig(string izqMem, string derMem)
-        {
-            IzqMem = izqMem;
-            DerMemVar = derMem;
-        }
+        
+        public override void Accept(IVisitor visitor) => visitor.Visit(this);
     }
 
-    public class Atom{}
+    public abstract class Atom : Node
+    {
+        public override void Accept(IVisitor visitor) => visitor.Visit(this);
+    }
 
     public class MyVar : Atom
     {
@@ -123,6 +133,8 @@ namespace AST_CIL
         {
             Name = name;
         }
+        
+        public override void Accept(IVisitor visitor) => visitor.Visit(this);
     }
 
     public class MyCons : Atom
@@ -133,24 +145,41 @@ namespace AST_CIL
         {
             Value = value;
         }
+        
+        public override void Accept(IVisitor visitor) => visitor.Visit(this);
     }
 
-//    public class OperationBin : Instruction // OJO: las operaciones solo van a ser con variables
-//    {
-//        // VCALL
-//        public string Dest;
-//        public string RigthOp;
-//        public string LeftOp;
-//        public readonly string Op;
-//
-//        public OperationBin(string dest, string rigthOp, string leftOp, string op)
-//        {
-//            Dest = dest;
-//            RigthOp = rigthOp;
-//            LeftOp = leftOp;
-//            Op = op;
-//        }
-//    }
+    public class Concat : Instruction
+    {
+        public string Dest;
+        public MyVar Var1;
+        public MyVar Var2;
+
+        public Concat(string dest, MyVar var1, MyVar var2)
+        {
+            Dest = dest;
+            Var1 = var1;
+            Var2 = var2;
+        }
+        
+        public override void Accept(IVisitor visitor) => visitor.Visit(this);
+    }
+
+    public class Substring : Instruction
+    {
+        public string Dest;
+        public MyVar Var1;
+        public MyVar Var2;
+
+        public Substring(string dest, MyVar var1, MyVar var2)
+        {
+            Dest = dest;
+            Var1 = var1;
+            Var2 = var2;
+        }
+        
+        public override void Accept(IVisitor visitor) => visitor.Visit(this);
+    }
 
     public class ArithExpr : Instruction
     {
@@ -166,6 +195,8 @@ namespace AST_CIL
             LeftOp = leftOp;
             Op = op;
         }
+        
+        public override void Accept(IVisitor visitor) => visitor.Visit(this);
     }
 
     public class GetAttr : Instruction
@@ -180,6 +211,8 @@ namespace AST_CIL
             Instance = instance;
             MyType = myType;
         }
+        
+        public override void Accept(IVisitor visitor) => visitor.Visit(this);
     }
 
     public class SetAttr : Instruction
@@ -194,6 +227,8 @@ namespace AST_CIL
             MyType = myType;
             Value = value;
         }
+        
+        public override void Accept(IVisitor visitor) => visitor.Visit(this);
     }
 
     public class VCall : Instruction
@@ -208,22 +243,9 @@ namespace AST_CIL
             MyType = myType;
             FuncName = funcName;
         }
+        
+        public override void Accept(IVisitor visitor) => visitor.Visit(this);
     }
-
-//    public class OperationUni : Instruction
-//    {
-//        // CALL, LOAD, LENGTH, CONCAT, SUBSTRING, STR y ConditionalJump(IF x GOTO l)
-//        public string RigthMem;
-//        public string LeftMem;
-//        public readonly string Op;
-//
-//        public OperationUni(string rigthMem, string leftMem, string op)
-//        {
-//            RigthMem = rigthMem;
-//            LeftMem = leftMem;
-//            Op = op;
-//        }
-//    }
 
     public class Allocate : Instruction
     {
@@ -235,21 +257,137 @@ namespace AST_CIL
             Dest = dest;
             MyType = myType;
         }
+        
+        public override void Accept(IVisitor visitor) => visitor.Visit(this);
+    }
+
+    public class Call : Instruction
+    {
+        public string Dest;
+        public Function MyFunc;
+
+        public Call(string dest, Function myFunc)
+        {
+            Dest = dest;
+            MyFunc = myFunc;
+        }
+        
+        public override void Accept(IVisitor visitor) => visitor.Visit(this);
+    }
+
+    public class Load : Instruction
+    {
+        public string Dest;
+        public MyVar Msg;
+
+        public Load(string dest, MyVar msg)
+        {
+            Dest = dest;
+            Msg = msg;
+        }
+        
+        public override void Accept(IVisitor visitor) => visitor.Visit(this);
     }
     
-    public class Call : Instruction
-    {}
-
-    public class SimpleOperation : Instruction
+    public class Length : Instruction
     {
-        // aqui entran LABEL, GOTO, RETURN, READ y PRINT
-        public string Obj;
-        public string Op;
+        public string Dest;
+        public MyVar Msg;
 
-        public SimpleOperation(string obj, string op)
+        public Length(string dest, MyVar msg)
         {
-            Obj = obj;
-            Op = op;
+            Dest = dest;
+            Msg = msg;
         }
+        
+        public override void Accept(IVisitor visitor) => visitor.Visit(this);
+    }
+
+    public class Str : Instruction
+    {
+        public string Dest;
+        public Atom MyVar;
+
+        public Str(string dest, Atom myVar)
+        {
+            Dest = dest;
+            MyVar = myVar;
+        }
+        
+        public override void Accept(IVisitor visitor) => visitor.Visit(this);
+    }
+
+    public class Label : Instruction
+    {
+        public string _label;
+
+        public Label(string label)
+        {
+            _label = label;
+        }
+        
+        public override void Accept(IVisitor visitor) => visitor.Visit(this);
+    }
+
+    public class Goto : Instruction
+    {
+        public string _label;
+
+        public Goto(string label)
+        {
+            _label = label;
+        }
+        
+        public override void Accept(IVisitor visitor) => visitor.Visit(this);
+    }
+
+    public class Return : Instruction
+    {
+        public Atom _atom;
+
+        public Return(Atom atom)
+        {
+            _atom = atom;
+        }
+        
+        public override void Accept(IVisitor visitor) => visitor.Visit(this);
+    }
+
+    public class Read : Instruction
+    {
+        public MyVar _var;
+
+        public Read(MyVar myVar)
+        {
+            _var = myVar;
+        }
+        
+        public override void Accept(IVisitor visitor) => visitor.Visit(this);
+    }
+    
+    public class Print : Instruction
+    {
+        public MyVar _var;
+
+        public Print(MyVar myVar)
+        {
+            _var = myVar;
+        }
+        
+        public override void Accept(IVisitor visitor) => visitor.Visit(this);
+    }
+
+    public class ConditionalJump : Node
+    {
+        public Atom ConditionVar;
+        public string Label;
+
+        public ConditionalJump(Atom conditionVar, string label)
+        {
+            ConditionVar = conditionVar;
+            Label = label;
+        }
+        
+        public override void Accept(IVisitor visitor) => visitor.Visit(this);
     }
 }
