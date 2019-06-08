@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace AST_CIL
 {
-        public class OneType
+    public class OneType
     {
         public List<string> Attributes;
         public List<Tuple<string, string>> Methods;
@@ -112,15 +113,53 @@ namespace AST_CIL
         }
     }
 
-    public class OperationBin : Instruction // OJO: las operaciones solo van a ser con variables
-    {
-        // aqui entran todas las expresiones aritmeticas, GETATTR, SETATTR y VCALL
-        public string Dest;
-        public string RigthOp;
-        public string LeftOp;
-        public readonly string Op;
+    public class Atom{}
 
-        public OperationBin(string dest, string rigthOp, string leftOp, string op)
+    public class MyVar : Atom
+    {
+        public string Name { get; }
+
+        public MyVar(string name)
+        {
+            Name = name;
+        }
+    }
+
+    public class MyCons : Atom
+    {
+        public int Value { get; }
+
+        public MyCons(int value)
+        {
+            Value = value;
+        }
+    }
+
+//    public class OperationBin : Instruction // OJO: las operaciones solo van a ser con variables
+//    {
+//        // VCALL
+//        public string Dest;
+//        public string RigthOp;
+//        public string LeftOp;
+//        public readonly string Op;
+//
+//        public OperationBin(string dest, string rigthOp, string leftOp, string op)
+//        {
+//            Dest = dest;
+//            RigthOp = rigthOp;
+//            LeftOp = leftOp;
+//            Op = op;
+//        }
+//    }
+
+    public class ArithExpr : Instruction
+    {
+        public string Dest;
+        public Atom RigthOp;
+        public Atom LeftOp;
+        public string Op;
+        
+        public ArithExpr(string dest, Atom rigthOp, Atom leftOp, string op)
         {
             Dest = dest;
             RigthOp = rigthOp;
@@ -129,20 +168,77 @@ namespace AST_CIL
         }
     }
 
-    public class OperationUni : Instruction
+    public class GetAttr : Instruction
     {
-        // aqui entran ALLOCATE, CALL, LOAD, LENGTH, CONCAT, SUBSTRING, STR y ConditionalJump(IF x GOTO l)
-        public string RigthMem;
-        public string LeftMem;
-        public readonly string Op;
+        public string Dest;
+        public string Instance;
+        public OneType MyType;
 
-        public OperationUni(string rigthMem, string leftMem, string op)
+        public GetAttr(string dest, string instance, OneType myType)
         {
-            RigthMem = rigthMem;
-            LeftMem = leftMem;
-            Op = op;
+            Dest = dest;
+            Instance = instance;
+            MyType = myType;
         }
     }
+
+    public class SetAttr : Instruction
+    {
+        public string Instance;
+        public OneType MyType;
+        public Atom Value;
+
+        public SetAttr(string instance, OneType myType, Atom value)
+        {
+            Instance = instance;
+            MyType = myType;
+            Value = value;
+        }
+    }
+
+    public class VCall : Instruction
+    {
+        public string Dest;
+        public OneType MyType;
+        public string FuncName;
+
+        public VCall(string dest, OneType myType, string funcName)
+        {
+            Dest = dest;
+            MyType = myType;
+            FuncName = funcName;
+        }
+    }
+
+//    public class OperationUni : Instruction
+//    {
+//        // CALL, LOAD, LENGTH, CONCAT, SUBSTRING, STR y ConditionalJump(IF x GOTO l)
+//        public string RigthMem;
+//        public string LeftMem;
+//        public readonly string Op;
+//
+//        public OperationUni(string rigthMem, string leftMem, string op)
+//        {
+//            RigthMem = rigthMem;
+//            LeftMem = leftMem;
+//            Op = op;
+//        }
+//    }
+
+    public class Allocate : Instruction
+    {
+        public string Dest;
+        public OneType MyType;
+
+        public Allocate(string dest, OneType myType)
+        {
+            Dest = dest;
+            MyType = myType;
+        }
+    }
+    
+    public class Call : Instruction
+    {}
 
     public class SimpleOperation : Instruction
     {
