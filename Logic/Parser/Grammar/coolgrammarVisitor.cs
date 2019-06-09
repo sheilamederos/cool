@@ -44,19 +44,19 @@ public interface IcoolgrammarVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitClass([NotNull] coolgrammarParser.ClassContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>f_method</c>
-	/// labeled alternative in <see cref="coolgrammarParser.feature"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitF_method([NotNull] coolgrammarParser.F_methodContext context);
-	/// <summary>
 	/// Visit a parse tree produced by the <c>f_attr</c>
 	/// labeled alternative in <see cref="coolgrammarParser.feature"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitF_attr([NotNull] coolgrammarParser.F_attrContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>f_method</c>
+	/// labeled alternative in <see cref="coolgrammarParser.feature"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitF_method([NotNull] coolgrammarParser.F_methodContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="coolgrammarParser.method"/>.
 	/// </summary>

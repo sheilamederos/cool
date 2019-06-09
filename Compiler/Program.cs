@@ -20,7 +20,7 @@ namespace Compiler
 
             foreach (var item in a.children)
             {
-                DFS(item, level + 1);
+                DFS(item, level + 3);
             }
 
             for (int i = 0; i < level; i++) Console.Write("-");
@@ -32,19 +32,16 @@ namespace Compiler
         static void Main(string[] args)
         {
             string text = @" 
-                    class Sheila inherits Persona
-                    {
-                        Edad : int <- 22;
-                        Mujer : bool <- true;
-                        Novio : Persona <- new Persona;
-                        i : INT <- 10;
+                    class Sheila inherits Persona {
+                                edad : Int <- 34 ;
+                                mujer : Bool <- true;
+                                novio: Persona <- new Persona;
+                                metodo1() : Int { {
+                                        while i < 0 loop i <- i - 1 pool;
+                                        i ;
+                                } };
 
-                        metodo1() : int {{while i > 0 loop i <- i - 1 pool; i; }};
-
-                        metodo2() : int { let a : int <- 3, b : int <- 5 in a * b; };
-
-                        metodo4() : bool { not true; };
-                    }; ";
+                                        };";
             DFS(GetAST.Show(text));
             /* Edad <- 22;
                         Mujer <- true;

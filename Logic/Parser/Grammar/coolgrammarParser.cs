@@ -266,17 +266,17 @@ public partial class coolgrammarParser : Parser {
 			ErrorHandler.Sync(this);
 			switch ( Interpreter.AdaptivePredict(TokenStream,3,Context) ) {
 			case 1:
-				_localctx = new F_methodContext(_localctx);
+				_localctx = new F_attrContext(_localctx);
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 44; method();
+				State = 44; attr();
 				}
 				break;
 			case 2:
-				_localctx = new F_attrContext(_localctx);
+				_localctx = new F_methodContext(_localctx);
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 45; attr();
+				State = 45; method();
 				}
 				break;
 			}
@@ -1178,8 +1178,8 @@ public partial class coolgrammarParser : Parser {
 		'\x3', '\x2', '\x2', '\x2', ')', '\'', '\x3', '\x2', '\x2', '\x2', ')', 
 		'*', '\x3', '\x2', '\x2', '\x2', '*', ',', '\x3', '\x2', '\x2', '\x2', 
 		'+', ')', '\x3', '\x2', '\x2', '\x2', ',', '-', '\a', '\x5', '\x2', '\x2', 
-		'-', '\x5', '\x3', '\x2', '\x2', '\x2', '.', '\x31', '\x5', '\b', '\x5', 
-		'\x2', '/', '\x31', '\x5', '\n', '\x6', '\x2', '\x30', '.', '\x3', '\x2', 
+		'-', '\x5', '\x3', '\x2', '\x2', '\x2', '.', '\x31', '\x5', '\n', '\x6', 
+		'\x2', '/', '\x31', '\x5', '\b', '\x5', '\x2', '\x30', '.', '\x3', '\x2', 
 		'\x2', '\x2', '\x30', '/', '\x3', '\x2', '\x2', '\x2', '\x31', '\a', '\x3', 
 		'\x2', '\x2', '\x2', '\x32', '\x33', '\a', '#', '\x2', '\x2', '\x33', 
 		'\x34', '\a', '\x6', '\x2', '\x2', '\x34', '\x35', '\x5', '\x12', '\n', 

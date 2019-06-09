@@ -50,7 +50,7 @@ namespace AST
 
         public override string ToString()
         {
-            return "Lista de" ; 
+            return "Lista de " + typeof(T).ToString() ; 
         }
 
 
@@ -117,7 +117,7 @@ namespace AST
 
         public override string ToString()
         {
-            return "atributo: " + name + " tipo: " + type;
+            return "atributo: " + name.ToString() + " tipo: " + type.ToString();
         }
     }    
 
@@ -125,10 +125,10 @@ namespace AST
     {
         public Id name;
         public Type_cool type;
-        public Formal(Id n, Type_cool t) : base (null)
+        public Formal(Id n, Type_cool t) : base (new Node[] { n, t })
         {
             name = n;
-            t = type;
+            type = t;
         }
 
         public override T Visit<T>(IVisitorAST<T> visitor) => visitor.Visit(this);
@@ -209,7 +209,7 @@ namespace AST
 
     public class If_Else : Expr
     {
-        Expr exp1, exp2, exp3;
+        public Expr exp1, exp2, exp3;
         public If_Else(Expr e1, Expr e2, Expr e3) : base(new Node[] { e1, e2, e3 })
         {
             exp1 = e1;
@@ -226,7 +226,7 @@ namespace AST
 
     public class While_loop : Expr
     {
-        Expr exp1, exp2;
+        public Expr exp1, exp2;
         public While_loop(Expr e1, Expr e2) : base(new Node[] { e1, e2 })
         {
             exp1 = e1;
@@ -242,7 +242,7 @@ namespace AST
 
     public class Body : Expr
     {
-        Lista<Expr> list;
+        public Lista<Expr> list;
         public Body(Lista<Expr> l) : base(new Node[] {l})
         {
             list = l;
@@ -274,7 +274,7 @@ namespace AST
 
     public class IsVoid : Expr
     {
-        Expr exp;
+        public Expr exp;
         public IsVoid(Expr e) : base (new Node[] { e})
         {
             exp = e;
@@ -336,7 +336,7 @@ namespace AST
 
         public override string ToString()
         {
-            return id.name + ' ' + "<-"+ ' ' + exp.ToString();
+            return "Assign";
         }
     }
 

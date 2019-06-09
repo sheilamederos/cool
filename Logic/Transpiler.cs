@@ -18,7 +18,9 @@ namespace Logic
             var input = new AntlrInputStream(text);
             var lexer = new coolgrammarLexer(input);
             var tokens = new CommonTokenStream(lexer);
-            var parser = new coolgrammarParser(tokens);
+            var parser = new coolgrammarParser(tokens) { BuildParseTree = true };
+            //Console.WriteLine(parser.program().ToString(parser));
+            
             var v = new Transpiler();
             return v.Visit(parser.program());
         }
@@ -32,6 +34,8 @@ namespace Logic
             Expr r = (Expr)Visit(context.expr());
             return new Assign(id, r);
         }
+        
+
         public override Node VisitSumaresta([NotNull] coolgrammarParser.SumarestaContext context)
         {
             Expr l = (Expr)Visit(context.expr(0));
@@ -119,13 +123,14 @@ namespace Logic
         public override Node VisitMethod([NotNull] coolgrammarParser.MethodContext context)
         {
             List<Formal> args = new List<Formal>();
+            Id id = (Id)Visit(context.ID());
             foreach (var item in context.args_def().formal())
             {
                 var v = Visit(item);
                 args.Add((Formal)v);
             }
             Expr exp = (Expr)Visit(context.expr());
-            return new Method_Def(new Id(context.ID().GetText()), new Type_cool(context.TYPE().GetText()), new Lista<Formal>(args), exp);
+            return new Method_Def(id, new Type_cool(context.TYPE().GetText()), new Lista<Formal>(args), exp);
         }
 
         public override Node VisitAttr([NotNull] coolgrammarParser.AttrContext context)
@@ -137,7 +142,9 @@ namespace Logic
 
         public override Node VisitFormal([NotNull] coolgrammarParser.FormalContext context)
         {
-            return new Formal(new Id(context.ID().GetText()), new Type_cool(context.TYPE().GetText()));
+            var id = new Id(context.ID().GetText());
+            var t = new Type_cool(context.TYPE().GetText());
+            return new Formal(id,t);
         }
 
         public override Node VisitCall_method([NotNull] coolgrammarParser.Call_methodContext context)
@@ -191,6 +198,7 @@ namespace Logic
             }
             return new Body(new Lista<Expr>(list));
         }
+        
 
         public override Node VisitNew_type([NotNull] coolgrammarParser.New_typeContext context)
         {
