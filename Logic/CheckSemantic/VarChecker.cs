@@ -7,6 +7,7 @@ using AST;
 
 namespace Logic.CheckSemantic
 {
+    //ver si estan definidos los tipos de las variables
     public class VarCheckerVisitor : IVisitorAST<bool>
     {
         ContextType Context; //tipos, metodos, atributos

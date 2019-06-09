@@ -74,6 +74,18 @@ namespace AST.Types
             return true; 
         }
 
+        public bool Conform(IType type)
+        {
+            IType iter = this;
+            if (type.Name == "object") return true;
+            while(iter.Name != "object")
+            {
+                if (iter.Name == type.Name) return true;
+                iter = iter.Father;
+            }
+            return false;
+        }
+
         public bool DefineMethod(Method mtd)
         {
             if (GetMethod(mtd.Name) != null) return false;

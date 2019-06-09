@@ -10,7 +10,9 @@ namespace Logic.CheckSemantic
 {
     public class TypeCheckerVisitor : IVisitorAST<bool>
     {
-        public TypeCheckerVisitor() { }
+        ContextType Context;
+
+        public TypeCheckerVisitor(ContextType cxt) { Context = cxt; }
 
         public bool Visit(Node node)
         {
@@ -30,14 +32,19 @@ namespace Logic.CheckSemantic
         {
             foreach (Node cldr in node.children)
             {
-                if (!this.Visit(cldr)) return false;
+                if (!this.Visit(cldr))
+                {
+                    node.type = null;
+                    return false;
+                }
             }
+            node.type = ((Expr)node.children[node.children.Count() - 1]).type;;
             return true;
         }
 
         public bool Visit(BinaryExpr node)
         {
-            if (!this.Visit(node.left) || !this.Visit(node.right) || node.left.type != node.right.type)
+            if(!this.Visit(node.left) || !this.Visit(node.right) || node.left.type.s != node.right.type.s)
             {
                 node.type = null;
                 return false;
@@ -47,7 +54,7 @@ namespace Logic.CheckSemantic
             return true;
 
         }
-
+        
         public bool Visit(UnaryExpr node)
         {
             if (!this.Visit(node.exp))
@@ -62,51 +69,76 @@ namespace Logic.CheckSemantic
 
         public bool Visit(Assign node)
         {
-            if (!this.Visit(node.exp))
-            {
-                node.type = null;
-                return false;
-            }
+            bool v_exp = this.Visit(node.exp);
+            IType type_exp = Context.GetType(node.exp.type.s);
+            IType type_id = Context.GetTypeFor(node.id.name);
 
-            node.type = node.exp.type;
+            if (!v_exp || !type_exp.Conform(type_id)) return false;
+
             return true;
         }
 
         public bool Visit(Const node)
         {
+            int num;
+            if ((node.type.s == "Int" && !int.TryParse(node.type.s, out num)) ||
+                (node.type.s == "Bool" && node.type.s != "true" && node.type.s != "false"))
+                return false;
+           
             return true;
         }
 
         public bool Visit(Lista<Node> node)
         {
-            throw new NotImplementedException();
+            foreach (Node cldr in node.children)
+            {
+                if (!this.Visit(cldr)) return false;
+            }
+            return true;
         }
 
         public bool Visit(Class_Def node)
         {
-            throw new NotImplementedException();
+            foreach (Node cldr in node.children)
+            {
+                if (!this.Visit(cldr)) return false;
+            }
+            return true;
         }
 
         public bool Visit(Method_Def node)
         {
-            throw new NotImplementedException();
+            foreach (Node cldr in node.children)
+            {
+                if (!this.Visit(cldr)) return false;
+            }
+            IType type_exp = Context.GetType(node.exp.type.s);
+            IType type_return = Context.GetType(node.type.s);
+            if (!type_exp.Conform(type_return)) return false;
+            return true;
         }
 
         public bool Visit(Attr_Def node)
         {
-            throw new NotImplementedException();
+            if (!this.Visit(node.exp)) return false;
+
+            IType type_formal = Context.GetType(node.type.s);
+            IType type_exp = Context.GetType(node.exp.type.s);
+            if (!type_exp.Conform(type_formal)) return false;
+
+            return true;
         }
 
         public bool Visit(Formal node)
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         public bool Visit(Type_cool node)
         {
-            throw new NotImplementedException();
+            return true;
         }
-
+        
         public bool Visit(Call_Method node)
         {
             throw new NotImplementedException();
@@ -114,37 +146,80 @@ namespace Logic.CheckSemantic
 
         public bool Visit(Let_In node)
         {
-            throw new NotImplementedException();
+            foreach (Node cld in node.attrs.list_Node)
+                if (!this.Visit(cld))
+                {
+                    node.type = null;
+                    return false;
+                }
+            if (!this.Visit(node.exp))
+            {
+                node.type = null;
+                return false;
+            }
+            node.type = node.exp.type;
+            return true;
         }
 
+        //Hacer publicos los atributos exp1, .. 
         public bool Visit(If_Else node)
         {
-            throw new NotImplementedException();
+            if(!this.Visit(node.exp1) || !this.Visit(node.exp2) || !this.Visit(node.exp3))
+            {
+                node.type = null;
+                return false;
+            }
+            IType type_exp1 = Context.GetType(node.exp1.type.s);
+            IType type_exp2 = Context.GetType(node.exp2.type.s);
+            IType type_exp3 = Context.GetType(node.exp3.type.s);
+
+            if(type_exp1.Name != "Bool")
+            {
+                node.type = null;
+                return false;
+            }
+            node.type = new Type_cool(Context.LCA().Name);
+            return true;
         }
 
+        //Hacer publico
         public bool Visit(While_loop node)
         {
-            throw new NotImplementedException();
+            if (!this.Visit(node.exp1) || !this.Visit(node.exp2))
+            {
+                node.type = null;
+                return false;
+            }
+            node.type = new Type_cool("object");
+            return true;
         }
 
+        //Hacer publico
         public bool Visit(Body node)
         {
-            throw new NotImplementedException();
+            if (!this.Visit(node.list))
+            {
+                node.type = null;
+                return true;
+            }
+
+            node.type = node.list.list_Node[node.list.list_Node.Count() - 1].type;
+            return true;
         }
 
         public bool Visit(New_type node)
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         public bool Visit(IsVoid node)
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         public bool Visit(Id node)
-        {
-            throw new NotImplementedException();
+        { 
+            return true;
         }
     }
 }

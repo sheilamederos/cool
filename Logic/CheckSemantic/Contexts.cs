@@ -8,22 +8,13 @@ using AST.Types;
 
 namespace Logic.CheckSemantic
 {
-    public interface IContext
+    public class ContextType
     {
-        IType GetType(string type);
-        IType GetTypeFor(string symbol);
-        IContext CreateChildContext();
-        bool DefineSymbol(string symbol, IType type);
-        IType CreateType(string name, IType father);
-    }
+        public ContextType Father { get; set; }
 
-    public class ContextType : IContext
-    {
-        ContextType Father { get; set; }
+        public List<IType> Types { get; set; }
 
-        List<IType> Types { get; set; }
-
-        Dictionary<string, IType> Symbols { get; set; }
+       public  Dictionary<string, IType> Symbols { get; set; }
 
         public ContextType(ContextType father)
         {
@@ -32,9 +23,19 @@ namespace Logic.CheckSemantic
             Symbols = new Dictionary<string, IType>();
         }
 
-        public IContext CreateChildContext()
+        public ContextType CreateChildContext()
         {
             return new ContextType(this);
+        }
+
+        public bool IsDefineSymbol(string name)
+        {
+            return Symbols.ContainsKey(name);
+        }
+
+        public bool IsDefineType(string name)
+        {
+            return Types.Select<IType, string>((t) => t.Name).Contains(name);
         }
 
         public IType CreateType(string name, IType father)
@@ -48,10 +49,6 @@ namespace Logic.CheckSemantic
 
         public bool DefineSymbol(string symbol, IType type)
         {
-            if (!Symbols.ContainsKey(symbol)) return false;
-
-            if (!Types.Contains(type)) return false;
-
             Symbols[symbol] = type;
 
             return true;
@@ -67,9 +64,12 @@ namespace Logic.CheckSemantic
 
         public IType GetTypeFor(string symbol)
         {
-            if (!Symbols.ContainsKey(symbol)) return null;
-
             return Symbols[symbol];
+        }
+
+        public IType LCA()
+        {
+            throw new NotImplementedException();
         }
     }
 }
