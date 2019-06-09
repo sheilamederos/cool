@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AST;
-using AST.Types;
+using Logic.CheckSemantic.Types;
 
 namespace Logic.CheckSemantic
 {
@@ -101,6 +101,7 @@ namespace Logic.CheckSemantic
         {
             foreach (Node cldr in node.children)
             {
+                Context.ActualType = Context.GetType(node.type.s);
                 if (!this.Visit(cldr)) return false;
             }
             return true;
@@ -141,7 +142,14 @@ namespace Logic.CheckSemantic
         
         public bool Visit(Call_Method node)
         {
-            throw new NotImplementedException();
+            foreach (Expr exp in node.args.list_Node)
+                if (!this.Visit(exp))
+                {
+                    node.type = null;
+                    return false;
+                }
+            node.type = new Type_cool(Context.ActualType.GetMethod(node.name.name).ReturnType.Name);
+            return true;
         }
 
         public bool Visit(Let_In node)
@@ -161,7 +169,6 @@ namespace Logic.CheckSemantic
             return true;
         }
 
-        //Hacer publicos los atributos exp1, .. 
         public bool Visit(If_Else node)
         {
             if(!this.Visit(node.exp1) || !this.Visit(node.exp2) || !this.Visit(node.exp3))
@@ -178,11 +185,10 @@ namespace Logic.CheckSemantic
                 node.type = null;
                 return false;
             }
-            node.type = new Type_cool(Context.LCA().Name);
+            node.type = new Type_cool(type_exp2.LCA(type_exp3).Name);
             return true;
         }
 
-        //Hacer publico
         public bool Visit(While_loop node)
         {
             if (!this.Visit(node.exp1) || !this.Visit(node.exp2))
@@ -190,11 +196,10 @@ namespace Logic.CheckSemantic
                 node.type = null;
                 return false;
             }
-            node.type = new Type_cool("object");
+            node.type = new Type_cool("Object");
             return true;
         }
 
-        //Hacer publico
         public bool Visit(Body node)
         {
             if (!this.Visit(node.list))

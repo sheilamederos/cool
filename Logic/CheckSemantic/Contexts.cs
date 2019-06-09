@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AST;
-using AST.Types;
+using Logic.CheckSemantic.Types;
 
 namespace Logic.CheckSemantic
 {
     public class ContextType
     {
         public ContextType Father { get; set; }
+
+        public IType ActualType { get; set; }
 
         public List<IType> Types { get; set; }
 
@@ -40,7 +41,7 @@ namespace Logic.CheckSemantic
 
         public IType CreateType(string name, IType father)
         {
-            IType type = new ComposeType(name, father);
+            IType type = new IType(name, father);
 
             Types.Add(type);
 
@@ -65,11 +66,6 @@ namespace Logic.CheckSemantic
         public IType GetTypeFor(string symbol)
         {
             return Symbols[symbol];
-        }
-
-        public IType LCA()
-        {
-            throw new NotImplementedException();
         }
     }
 }

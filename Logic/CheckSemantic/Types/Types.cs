@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AST.Types
+namespace Logic.CheckSemantic.Types
 {
     public class Attribute
     {
@@ -18,31 +18,31 @@ namespace AST.Types
         }
     }
 
-    public abstract class Method 
+    public class Method 
 {
         public string Name { get; }
         public IType ReturnType { get; }
         public List<Attribute> Arguments { get; }
+        public IType TypeSelf { get; }
 
-        public Method(string name, IType retType)
+        public Method(string name, IType retType, IType typeSelf)
         {
             Name = name;
             ReturnType = retType;
             Arguments = new List<Attribute>();
+            TypeSelf = typeSelf;
         }
 
-        public Method(string name, IType retType, List<Attribute> attr)
+        public Method(string name, IType retType, List<Attribute> attr, IType typeSelf)
         {
             Name = name;
             ReturnType = retType;
             Arguments = attr;
+            TypeSelf = typeSelf;
         }
-
-        public abstract TypeValue Call(List<TypeValue> args);
-
     }
 
-    public abstract class IType
+    public class IType
     {
         public IType Father { get; }
         public string Name { get; }
@@ -77,8 +77,8 @@ namespace AST.Types
         public bool Conform(IType type)
         {
             IType iter = this;
-            if (type.Name == "object") return true;
-            while(iter.Name != "object")
+            if (type.Name == "Object") return true;
+            while(iter.Name != "Object")
             {
                 if (iter.Name == type.Name) return true;
                 iter = iter.Father;
@@ -131,29 +131,11 @@ namespace AST.Types
             return null;
         }
 
-        public abstract TypeValue Default();
-    }
-
-    public class ComposeType : IType
-    {
-        public ComposeType(string name, IType father) : base(name, father) { }
-
-        public override TypeValue Default()
+        public IType LCA(IType other)
         {
-            return new TypeValue(this, null);
+            if (this.Conform(other)) return other;
+            if (other.Conform(this)) return this;
+            return this.LCA(other.Father);
         }
     }
-
-    public class TypeValue
-    {
-        public IType Type { get; }
-        public object Value { get; }
-
-        public TypeValue(IType type, object value)
-        {
-            Type = type;
-            Value = value;
-        }
-    }
-
 }

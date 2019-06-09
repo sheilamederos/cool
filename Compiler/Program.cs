@@ -29,7 +29,7 @@ namespace Compiler
             Console.WriteLine("> {0} ", a.ToString());
 
         }
-        static void Main(string[] args)
+        static void Main1(string[] args)
         {
             string text = @" 
                     class Sheila inherits Persona {
