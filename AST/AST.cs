@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Antlr4.Runtime;
-using Antlr4.Runtime.Tree;
 
 namespace AST
 {
@@ -52,8 +50,6 @@ namespace AST
         {
             return "Lista de" ; 
         }
-
-
     }
 
     public class Class_Def : Node
