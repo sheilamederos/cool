@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AST;
 
 namespace Logic.CheckSemantic.Types
 {
@@ -25,9 +26,9 @@ namespace Logic.CheckSemantic.Types
         public string Name { get; }
         public IType ReturnType { get; }
         public List<Attribute> Arguments { get; set; }
-        public IType TypeSelf { get; }
+        public string TypeSelf { get; }
 
-        public Method(string name, IType retType, IType typeSelf)
+        public Method(string name, IType retType, string typeSelf)
         {
             Name = name;
             ReturnType = retType;
@@ -35,7 +36,7 @@ namespace Logic.CheckSemantic.Types
             TypeSelf = typeSelf;
         }
 
-        public Method(string name, IType retType, List<Attribute> attr, IType typeSelf)
+        public Method(string name, IType retType, List<Attribute> attr, string typeSelf)
         {
             Name = name;
             ReturnType = retType;
@@ -133,18 +134,18 @@ namespace Logic.CheckSemantic.Types
             IType TBool = new IType("Bool", TObject);
             IType TIO = new IType("IO", TObject);
 
-            Method m1 = new Method("abort", TObject, TObject);
-            Method m2 = new Method("type_name", TString, TObject);
-            Method m3 = new Method("copy", TSelfType, TObject);
+            Method m1 = new Method("abort", TObject, "Object");
+            Method m2 = new Method("type_name", TString, "Object");
+            Method m3 = new Method("copy", TSelfType, "Object");
 
-            Method m4 = new Method("length", TInt, TString);
-            Method m5 = new Method("concat", TString, new List<Attribute> { new Attribute("x", TString) }, TString);
-            Method m6 = new Method("substr", TString, new List<Attribute> { new Attribute("i", TInt), new Attribute("l", TInt) }, TString);
+            Method m4 = new Method("length", TInt, "String");
+            Method m5 = new Method("concat", TString, new List<Attribute> { new Attribute("x", TString) }, "String");
+            Method m6 = new Method("substr", TString, new List<Attribute> { new Attribute("i", TInt), new Attribute("l", TInt) }, "String");
 
-            Method m7 = new Method("out_string", TSelfType, new List<Attribute> { new Attribute("x", TString) }, TIO);
-            Method m8 = new Method("out_int", TSelfType, new List<Attribute> { new Attribute("x", TInt) }, TIO);
-            Method m9 = new Method("in_string", TString, TIO);
-            Method m10 = new Method("in_int", TInt, TIO);
+            Method m7 = new Method("out_string", TSelfType, new List<Attribute> { new Attribute("x", TString) }, "IO");
+            Method m8 = new Method("out_int", TSelfType, new List<Attribute> { new Attribute("x", TInt) }, "IO");
+            Method m9 = new Method("in_string", TString, "IO");
+            Method m10 = new Method("in_int", TInt, "IO");
 
             TObject.Methods = new List<Method> { m1, m2, m3 };
             TString.Methods = new List<Method> { m4, m5, m6 };
@@ -160,6 +161,39 @@ namespace Logic.CheckSemantic.Types
             return types;
         }
 
+        public static Dictionary<string, IType> GetAllTypes(Program Ast)
+        {
+            List<IType> types_built_in = GetTypesBuilt_in();
 
+            Dictionary<string, IType> types = new Dictionary<string, IType>();
+            foreach (var item in types_built_in)
+                types[item.Name] = item;
+
+            foreach (Class_Def Class in Ast.list)
+                types[Class.type.s] = types[Class.inherit_type.s];
+
+            foreach (Class_Def Class in Ast.list)
+            {
+                List<Attribute> attrs = new List<Attribute>();
+                List<Method> mtds = new List<Method>();
+
+                foreach (Attr_Def attr in Class.attr.list_Node)
+                    attrs.Add(new Attribute(attr.name.name, types[attr.type.s], Class.type.s));
+
+                foreach (Method_Def mtd in Class.method.list_Node)
+                {
+                    List<Attribute> args = new List<Attribute>();
+                    foreach (Formal arg in mtd.args.list_Node)
+                        args.Add(new Attribute(arg.name.name, types[arg.type.s]));
+
+                    mtds.Add(new Method(mtd.name.name, types[mtd.type.s], args, Class.type.s));
+                }
+
+                types[Class.type.s].Attributes = attrs;
+                types[Class.type.s].Methods = mtds;
+            }
+
+            return types;
+        }
     }
 }
