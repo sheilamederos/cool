@@ -58,8 +58,8 @@ namespace AST
 
     public class Class_Def : Node
     {
-        Type_cool type;
-        Type_cool inherit_type;
+        public Type_cool type;
+        public Type_cool inherit_type;
         public Lista<Method_Def> method;
         public Lista<Attr_Def> attr;
         public Class_Def(Type_cool t, Type_cool t1, Lista<Method_Def> m, Lista<Attr_Def> a) : base(new Node[] { m, a })
@@ -185,6 +185,41 @@ namespace AST
         public override string ToString()
         {
             return "Call_Method: " + name;
+        }
+    }
+    public class Dispatch : Expr
+    {
+        public Expr exp;
+        public Call_Method call;
+        string s;
+        public Dispatch(Expr exp, Type_cool type, Call_Method call) : base (new Node[] { exp, type, call })
+        {
+            this.exp = exp;
+            this.type = type;
+            this.call = call;
+            s = (this.type != null) ? this.type.s + ' ' : "sin castear "; 
+        }
+
+        public override T Visit<T>(IVisitorAST<T> visitor) => visitor.Visit(this);
+
+        public override string ToString()
+        {
+            return "Dispatch: " + "Exp: " + exp.ToString() + " " + "tipo: " + this.s + call.ToString() ;
+        }
+    }
+
+    public class Str : Expr
+    {
+        public string s;
+        public Str(string s) : base (null)
+        {
+            this.s = s.Substring(1, s.Length - 2);
+        }
+        public override T Visit<T>(IVisitorAST<T> visitor) => visitor.Visit(this);
+
+        public override string ToString()
+        {
+            return s;
         }
     }
 
@@ -369,5 +404,7 @@ namespace AST
             return name;
         }
     }
+
+    
 
 }

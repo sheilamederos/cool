@@ -181,6 +181,20 @@ public interface IcoolgrammarVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitParentesis([NotNull] coolgrammarParser.ParentesisContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>string</c>
+	/// labeled alternative in <see cref="coolgrammarParser.expr"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitString([NotNull] coolgrammarParser.StringContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>dispatch</c>
+	/// labeled alternative in <see cref="coolgrammarParser.expr"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitDispatch([NotNull] coolgrammarParser.DispatchContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>bool</c>
 	/// labeled alternative in <see cref="coolgrammarParser.expr"/>.
 	/// </summary>

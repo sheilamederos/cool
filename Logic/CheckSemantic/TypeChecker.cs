@@ -226,5 +226,15 @@ namespace Logic.CheckSemantic
         { 
             return true;
         }
+
+        public bool Visit(Dispatch node)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Visit(Str node)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
