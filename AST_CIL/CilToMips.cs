@@ -31,9 +31,6 @@
         {
             foreach (var strVar in data._stringVars)
                 this.Data += strVar.Item1 + ":\t .asciiz \t" + "\"" + strVar.Item2 + "\"\n";
-
-            foreach (var intVar in data._integerVars)
-                this.Data += intVar.Item1 + ":\t .word \t" + intVar.Item2 + "\n";
         }
 
         public void Accept(CIL_Instruction ins)
@@ -43,11 +40,10 @@
 
         public void Accept(CIL_Function function)
         {
-            // andamos por aqui
-            foreach (var arg in function.Args)
-            {
-                
-            }
+            int n = 0; // calcualar este n, es la cantidad de espacios que voy a reservar para
+                       // esta funcion en el stack
+
+            Text += "";
         }
 
         public void Accept(CIL_Code code)

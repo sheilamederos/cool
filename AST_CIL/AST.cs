@@ -78,23 +78,26 @@ namespace AST_CIL
     {
         public override void Accept(IVisitor visitor) => visitor.Accept(this);
     }
-    
+
     public class CIL_Function : CIL_Node
     {
-        public List<string> Args; // estos son los nombres de las variables
-        public List<string> Locals;
+        private string _name;
+        public string Name => _name;
+        public Dictionary<string, int> Args;   // estos son los nombres de las variables y el lugar que ocupan en
+        public Dictionary<string, int> Locals; // memoria en MIPS
         public List<CIL_Instruction> Instructions;
 
-        public CIL_Function(List<string> inValues)
+        public CIL_Function(string name, Dictionary<string, int> inValues)
         {
+            _name = name;
             Args = inValues;
-            Locals = new List<string>();
+            Locals = new Dictionary<string, int>();
             Instructions = new List<CIL_Instruction>();
         }
 
-        public void AddLocal(string name)
+        public void AddLocal(string name, int id)
         {
-            Locals.Add(name);
+            Locals.Add(name, id);
         }
 
         public void AddInstruction(CIL_Instruction ins)
@@ -130,7 +133,7 @@ namespace AST_CIL
         public CIL_Assig(string dest, CIL_Atom rigthMem)
         {
             Dest = dest;
-            RigthMem = RigthMem;
+            RigthMem = rigthMem;
         }
         
         public override void Accept(IVisitor visitor) => visitor.Accept(this);
