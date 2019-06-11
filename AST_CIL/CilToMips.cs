@@ -40,10 +40,23 @@
 
         public void Accept(CIL_Function function)
         {
-            int n = 0; // calcualar este n, es la cantidad de espacios que voy a reservar para
-                       // esta funcion en el stack
+            // TODO:calcualar este n, es la cantidad de espacios que voy a reservar para esta funcion en el stack
+            int n = 0; 
 
-            Text += "";
+            Text += function.Name + ":\n";
+
+            string memAllocate = "\t subu $sp, $sp, " + n + "\n" +
+                                 "\t sw $ra, 20($sp) \n" +
+                                 "\t sw $fp, 16($sp) \n" +
+                                 "\t addu $fp, $sp, " + n + "\n";
+
+            foreach (var inst in function.Instructions)
+                inst.Accept(this);
+            
+            string memDeAllocate = "\t lw $ra, 20($sp) \n" +
+                                   "\t lw $fp, 16($sp) \n" +
+                                   "\t addu $sp, $sp, " + n + "\n" +
+                                   "\t j $ra"; // aqui por el momento voy a poner j pero puede ser jr
         }
 
         public void Accept(CIL_Code code)
