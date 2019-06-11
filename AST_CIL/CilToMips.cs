@@ -1,4 +1,6 @@
-﻿namespace AST_CIL
+﻿using System.Web;
+
+namespace AST_CIL
 {
     public class CilToMips : IVisitor
     {
@@ -45,18 +47,18 @@
 
             Text += function.Name + ":\n";
 
-            string memAllocate = "\t subu $sp, $sp, " + n + "\n" +
-                                 "\t sw $ra, 20($sp) \n" +
-                                 "\t sw $fp, 16($sp) \n" +
-                                 "\t addu $fp, $sp, " + n + "\n";
+            Text += "\t subu $sp, $sp, " + n + "\n" +
+                    "\t sw $ra, 20($sp) \n" +
+                    "\t sw $fp, 16($sp) \n" +
+                    "\t addu $fp, $sp, " + n + "\n";
 
             foreach (var inst in function.Instructions)
                 inst.Accept(this);
             
-            string memDeAllocate = "\t lw $ra, 20($sp) \n" +
-                                   "\t lw $fp, 16($sp) \n" +
-                                   "\t addu $sp, $sp, " + n + "\n" +
-                                   "\t j $ra"; // aqui por el momento voy a poner j pero puede ser jr
+            Text += "\t lw $ra, 20($sp) \n" +
+                    "\t lw $fp, 16($sp) \n" +
+                    "\t addu $sp, $sp, " + n + "\n" +
+                    "\t j $ra \n"; // aqui por el momento voy a poner j pero puede ser jr
         }
 
         public void Accept(CIL_Code code)
@@ -67,7 +69,18 @@
 
         public void Accept(CIL_Assig assig)
         {
-            throw new System.NotImplementedException();
+            int destPos = 4 * (assig.Dest.Id + 1);
+
+            if (assig.RigthMem is CIL_MyVar rigthMem)
+            {
+                int rigthPos = 4 * (rigthMem.Id + 1);
+                
+                Text += "\t sw " + rigthPos + "($sp), " + destPos + "($sp) \n";
+            }
+            else
+            {
+                Text += "\t sw " + ((CIL_MyCons) assig.RigthMem).Value + ", " + destPos + "($sp) \n";
+            }
         }
 
         public void Accept(CIL_Atom atom)
@@ -80,7 +93,7 @@
             throw new System.NotImplementedException();
         }
 
-        public void Accept(MyVar myVar)
+        public void Accept(CIL_MyVar myVar)
         {
             throw new System.NotImplementedException();
         }
@@ -97,7 +110,30 @@
 
         public void Accept(CIL_ArithExpr arithExpr)
         {
-            throw new System.NotImplementedException();
+            int desPos = 4 * (arithExpr.Dest.Id + 1);
+
+            // 
+            string leftMem = "";
+            
+            if (arithExpr.LeftOp is CIL_MyVar myVar1)
+            {
+                leftMem = 4 * (myVar1.Id + 1) + "($sp)";
+            }
+            else
+            {
+                leftMem = ((CIL_MyCons) arithExpr.LeftOp).Value.ToString();
+            }
+
+            string rigthMem = "";
+
+            if (arithExpr.RigthOp is CIL_MyVar myVar2)
+            {
+                rigthMem = 4 * (myVar2.Id + 1) + "($sp)";
+            }
+            else
+            {
+                rigthMem = ((CIL_MyCons) arithExpr.RigthOp).Value.ToString();
+            }
         }
 
         public void Accept(CIL_GetAttr getAttr)

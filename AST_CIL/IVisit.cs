@@ -26,7 +26,7 @@ namespace AST_CIL
 
         void Accept(CIL_MyCons myCons);
 
-        void Accept(MyVar myVar);
+        void Accept(CIL_MyVar myVar);
 
         void Accept(CIL_Concat concat);
 

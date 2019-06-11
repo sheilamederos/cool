@@ -127,10 +127,10 @@ namespace AST_CIL
 
     public class CIL_Assig : CIL_Instruction
     {
-        public string Dest;
+        public CIL_MyVar Dest;
         public CIL_Atom RigthMem;
 
-        public CIL_Assig(string dest, CIL_Atom rigthMem)
+        public CIL_Assig(CIL_MyVar dest, CIL_Atom rigthMem)
         {
             Dest = dest;
             RigthMem = rigthMem;
@@ -144,13 +144,15 @@ namespace AST_CIL
         public override void Accept(IVisitor visitor) => visitor.Accept(this);
     }
 
-    public class MyVar : CIL_Atom
+    public class CIL_MyVar : CIL_Atom
     {
         public string Name { get; }
+        public int Id { get; }
 
-        public MyVar(string name)
+        public CIL_MyVar(string name, int id)
         {
             Name = name;
+            Id = id;
         }
         
         public override void Accept(IVisitor visitor) => visitor.Accept(this);
@@ -170,11 +172,11 @@ namespace AST_CIL
 
     public class CIL_Concat : CIL_Instruction
     {
-        public string Dest;
-        public MyVar Var1;
-        public MyVar Var2;
+        public CIL_MyVar Dest;
+        public CIL_MyVar Var1;
+        public CIL_MyVar Var2;
 
-        public CIL_Concat(string dest, MyVar var1, MyVar var2)
+        public CIL_Concat(CIL_MyVar dest, CIL_MyVar var1, CIL_MyVar var2)
         {
             Dest = dest;
             Var1 = var1;
@@ -187,10 +189,10 @@ namespace AST_CIL
     public class CIL_Substring : CIL_Instruction
     {
         public string Dest;
-        public MyVar Var1;
-        public MyVar Var2;
+        public CIL_MyVar Var1;
+        public CIL_MyVar Var2;
 
-        public CIL_Substring(string dest, MyVar var1, MyVar var2)
+        public CIL_Substring(string dest, CIL_MyVar var1, CIL_MyVar var2)
         {
             Dest = dest;
             Var1 = var1;
@@ -202,12 +204,12 @@ namespace AST_CIL
 
     public class CIL_ArithExpr : CIL_Instruction
     {
-        public string Dest;
+        public CIL_MyVar Dest;
         public CIL_Atom RigthOp;
         public CIL_Atom LeftOp;
         public string Op;
         
-        public CIL_ArithExpr(string dest, CIL_Atom rigthOp, CIL_Atom leftOp, string op)
+        public CIL_ArithExpr(CIL_MyVar dest, CIL_Atom rigthOp, CIL_Atom leftOp, string op)
         {
             Dest = dest;
             RigthOp = rigthOp;
@@ -297,9 +299,9 @@ namespace AST_CIL
     public class CIL_Load : CIL_Instruction
     {
         public string Dest;
-        public MyVar Msg;
+        public CIL_MyVar Msg;
 
-        public CIL_Load(string dest, MyVar msg)
+        public CIL_Load(string dest, CIL_MyVar msg)
         {
             Dest = dest;
             Msg = msg;
@@ -311,9 +313,9 @@ namespace AST_CIL
     public class CIL_Length : CIL_Instruction
     {
         public string Dest;
-        public MyVar Msg;
+        public CIL_MyVar Msg;
 
-        public CIL_Length(string dest, MyVar msg)
+        public CIL_Length(string dest, CIL_MyVar msg)
         {
             Dest = dest;
             Msg = msg;
@@ -374,9 +376,9 @@ namespace AST_CIL
 
     public class CIL_Read : CIL_Instruction
     {
-        public MyVar _var;
+        public CIL_MyVar _var;
 
-        public CIL_Read(MyVar myVar)
+        public CIL_Read(CIL_MyVar myVar)
         {
             _var = myVar;
         }
@@ -386,9 +388,9 @@ namespace AST_CIL
     
     public class CIL_Print : CIL_Instruction
     {
-        public MyVar _var;
+        public CIL_MyVar _var;
 
-        public CIL_Print(MyVar myVar)
+        public CIL_Print(CIL_MyVar myVar)
         {
             _var = myVar;
         }
