@@ -9,29 +9,22 @@ namespace Logic.CheckSemantic
 {
     public class ContextType
     {
-        public ContextType Father { get; set; }
-
         public IType ActualType { get; set; }
 
         public List<IType> Types { get; set; }
 
-       public  Dictionary<string, IType> Symbols { get; set; }
+        public Stack<Tuple<string, IType>> Symbols { get; set; }
 
-        public ContextType(ContextType father)
+        public ContextType(List<IType> list)
         {
-            Father = father;
-            Types = new List<IType>();
-            Symbols = new Dictionary<string, IType>();
-        }
-
-        public ContextType CreateChildContext()
-        {
-            return new ContextType(this);
+            Types = list;
+            Symbols = new Stack<Tuple<string, IType>>();
         }
 
         public bool IsDefineSymbol(string name)
         {
-            return Symbols.ContainsKey(name);
+            List<string> list = (List<string>)Symbols.Select<Tuple<string, IType>, string>((t) => t.Item1);
+            return list.Contains(name);
         }
 
         public bool IsDefineType(string name)
@@ -39,20 +32,14 @@ namespace Logic.CheckSemantic
             return Types.Select<IType, string>((t) => t.Name).Contains(name);
         }
 
-        public IType CreateType(string name, IType father)
+        public void AddType(IType type)
         {
-            IType type = new IType(name, father);
-
             Types.Add(type);
-
-            return type;
         }
 
-        public bool DefineSymbol(string symbol, IType type)
+        public void DefineSymbol(string symbol, IType type)
         {
-            Symbols[symbol] = type;
-
-            return true;
+            Symbols.Push(new Tuple<string, IType>(symbol, type));
         }
 
         public IType GetType(string type)
@@ -65,7 +52,10 @@ namespace Logic.CheckSemantic
 
         public IType GetTypeFor(string symbol)
         {
-            return Symbols[symbol];
+            foreach (var tuple in Symbols)
+                if (tuple.Item1 == symbol) return tuple.Item2;
+
+            return null; 
         }
     }
 }

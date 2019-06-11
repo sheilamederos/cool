@@ -8,66 +8,71 @@ using Logic.CheckSemantic.Types;
 
 namespace Logic.CheckSemantic
 {
-    public class TypeCheckerVisitor : IVisitorAST<bool>
+    public class TypeCheckerVisitor : IVisitorAST<IType>
     {
         ContextType Context;
 
+        string Logger;
+
         public TypeCheckerVisitor(ContextType cxt) { Context = cxt; }
 
-        public bool Visit(Node node)
+        public IType Visit(Node node)
         {
             throw new NotImplementedException();
         }
 
-        public bool Visit(Program node)
+        public IType Visit(Program node)
         {
             foreach (Node cldr in node.children)
-            {
-                if (!this.Visit(cldr)) return false;
-            }
-            return true;
+                this.Visit(cldr);
+            return null;
         }
 
-        public bool Visit(Expr node)
+        public IType Visit(Expr node)
         {
-            foreach (Node cldr in node.children)
+            throw new NotImplementedException();
+        }
+
+        public IType Visit(BinaryExpr node)
+        {
+            IType type_left = this.Visit(node.left);
+            IType type_rigth = this.Visit(node.right);
+
+            List<string> arith_op = new List<string> { "+", "-", "*", "/" };
+            List<string> comp_op = new List<string> { "<", "<=" };
+            List<string> basic_types = new List<string> { "Int", "Bool", "String" };
+
+            if (arith_op.Contains(node.op))
             {
-                if (!this.Visit(cldr))
+                if (type_left.Name != "Int" || type_rigth.Name != "Int")
                 {
-                    node.type = null;
-                    return false;
+                    Logger += "\n Error ";
+                    return null;
                 }
+                else return Context.GetType("Int");
             }
-            node.type = ((Expr)node.children[node.children.Count() - 1]).type;;
-            return true;
-        }
 
-        public bool Visit(BinaryExpr node)
-        {
-            if(!this.Visit(node.left) || !this.Visit(node.right) || node.left.type.s != node.right.type.s)
+            if(comp_op.Contains(node.op))
             {
-                node.type = null;
-                return false;
+                if (type_left.Name != "Int" || type_rigth.Name != "Int")
+                    return null;
+                else return Context.GetType("Bool");
             }
 
-            node.type = node.left.type;
-            return true;
+            if(!basic_types.Contains(type_left.Name) || !basic_types.Contains(type_rigth.Name))
+                return null;
+
+            return type_left;
 
         }
         
-        public bool Visit(UnaryExpr node)
+        public IType Visit(UnaryExpr node)
         {
-            if (!this.Visit(node.exp))
-            {
-                node.type = null;
-                return false;
-            }
-
-            node.type = node.exp.type;
-            return true;
+            return this.Visit(node.exp);
+            
         }
 
-        public bool Visit(Assign node)
+        public IType Visit(Assign node)
         {
             bool v_exp = this.Visit(node.exp);
             IType type_exp = Context.GetType(node.exp.type.s);
@@ -78,7 +83,7 @@ namespace Logic.CheckSemantic
             return true;
         }
 
-        public bool Visit(Const node)
+        public IType Visit(Const node)
         {
             int num;
             if ((node.type.s == "Int" && !int.TryParse(node.type.s, out num)) ||
@@ -88,7 +93,7 @@ namespace Logic.CheckSemantic
             return true;
         }
 
-        public bool Visit(Lista<Node> node)
+        public IType Visit(Lista<Node> node)
         {
             foreach (Node cldr in node.children)
             {
@@ -97,7 +102,7 @@ namespace Logic.CheckSemantic
             return true;
         }
 
-        public bool Visit(Class_Def node)
+        public IType Visit(Class_Def node)
         {
             foreach (Node cldr in node.children)
             {
@@ -107,7 +112,7 @@ namespace Logic.CheckSemantic
             return true;
         }
 
-        public bool Visit(Method_Def node)
+        public IType Visit(Method_Def node)
         {
             foreach (Node cldr in node.children)
             {
@@ -119,7 +124,7 @@ namespace Logic.CheckSemantic
             return true;
         }
 
-        public bool Visit(Attr_Def node)
+        public IType Visit(Attr_Def node)
         {
             if (!this.Visit(node.exp)) return false;
 
@@ -130,17 +135,17 @@ namespace Logic.CheckSemantic
             return true;
         }
 
-        public bool Visit(Formal node)
+        public IType Visit(Formal node)
         {
             return true;
         }
 
-        public bool Visit(Type_cool node)
+        public IType Visit(Type_cool node)
         {
             return true;
         }
         
-        public bool Visit(Call_Method node)
+        public IType Visit(Call_Method node)
         {
             foreach (Expr exp in node.args.list_Node)
                 if (!this.Visit(exp))
@@ -152,7 +157,7 @@ namespace Logic.CheckSemantic
             return true;
         }
 
-        public bool Visit(Let_In node)
+        public IType Visit(Let_In node)
         {
             foreach (Node cld in node.attrs.list_Node)
                 if (!this.Visit(cld))
@@ -169,7 +174,7 @@ namespace Logic.CheckSemantic
             return true;
         }
 
-        public bool Visit(If_Else node)
+        public IType Visit(If_Else node)
         {
             if(!this.Visit(node.exp1) || !this.Visit(node.exp2) || !this.Visit(node.exp3))
             {
@@ -189,7 +194,7 @@ namespace Logic.CheckSemantic
             return true;
         }
 
-        public bool Visit(While_loop node)
+        public IType Visit(While_loop node)
         {
             if (!this.Visit(node.exp1) || !this.Visit(node.exp2))
             {
@@ -200,7 +205,7 @@ namespace Logic.CheckSemantic
             return true;
         }
 
-        public bool Visit(Body node)
+        public IType Visit(Body node)
         {
             if (!this.Visit(node.list))
             {
@@ -212,27 +217,32 @@ namespace Logic.CheckSemantic
             return true;
         }
 
-        public bool Visit(New_type node)
+        public IType Visit(New_type node)
         {
             return true;
         }
 
-        public bool Visit(IsVoid node)
+        public IType Visit(IsVoid node)
         {
             return true;
         }
 
-        public bool Visit(Id node)
+        public IType Visit(Id node)
         { 
             return true;
         }
 
-        public bool Visit(Dispatch node)
+        public IType Visit(Dispatch node)
         {
             throw new NotImplementedException();
+            //bool v_call_method = this.Visit(node.call);
+            //bool v_exp = this.Visit(node.exp);
+
+//            bool conf = Context.GetType(node.exp.type.s).Conform(Context.GetType(node.caster.s))
+            
         }
 
-        public bool Visit(Str node)
+        public IType Visit(Str node)
         {
             throw new NotImplementedException();
         }
