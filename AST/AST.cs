@@ -191,7 +191,7 @@ namespace AST
     {
         public Expr exp;
         public Call_Method call;
-        string s;
+        public string s;
         public Dispatch(Expr exp, Type_cool type, Call_Method call) : base (new Node[] { exp, type, call })
         {
             this.exp = exp;

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Logic.CheckSemantic.Types;
 using AST;
 using Logic;
+using Logic.CheckSemantic;
 
 namespace Compiler
 {
@@ -26,8 +27,14 @@ namespace Compiler
                                         };";
 
 
-            Node ast = GetAST.Show(text);
+            AST.Program ast = (AST.Program) GetAST.Show(text);
             Program.DFS(ast);
+
+            Dictionary<string, IType> types = IType.GetAllTypes(ast);
+            ContextType context = new ContextType(types);
+            var TypeCheck = new TypeCheckerVisitor(context);
+            TypeCheck.Visit(ast);
+            Console.WriteLine(TypeCheck.Logger);
         }
     }
 }

@@ -47,7 +47,7 @@ namespace Logic.CheckSemantic.Types
 
     public class IType
     {
-        public IType Father { get; }
+        public IType Father { get; set; }
         public string Name { get; }
         public List<Attribute> Attributes { get; set; }
         public List<Method> Methods { get; set; }
@@ -170,7 +170,10 @@ namespace Logic.CheckSemantic.Types
                 types[item.Name] = item;
 
             foreach (Class_Def Class in Ast.list)
-                types[Class.type.s] = types[Class.inherit_type.s];
+                types[Class.type.s] = new IType(Class.type.s, null);
+
+            foreach (Class_Def Class in Ast.list)
+                types[Class.type.s].Father = types[Class.inherit_type.s];
 
             foreach (Class_Def Class in Ast.list)
             {

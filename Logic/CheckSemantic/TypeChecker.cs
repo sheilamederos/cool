@@ -12,7 +12,7 @@ namespace Logic.CheckSemantic
     {
         ContextType Context;
 
-        string Logger;
+        public string Logger;
 
         public TypeCheckerVisitor(ContextType cxt) { Context = cxt; }
 
@@ -23,8 +23,11 @@ namespace Logic.CheckSemantic
 
         public IType Visit(Program node)
         {
-            foreach (Node cldr in node.children)
+            foreach (Class_Def cldr in node.list)
+            {
+                Context.ActualType = Context.GetType(cldr.type.s);
                 this.Visit(cldr);
+            }
             return null;
         }
 
@@ -46,21 +49,33 @@ namespace Logic.CheckSemantic
             {
                 if (type_left.Name != "Int" || type_rigth.Name != "Int")
                 {
-                    Logger += "\n Error ";
+                    Logger += "En la expresion " + node.ToString() + "-> error de compatibilidad de tipos Int \n";
                     return null;
                 }
-                else return Context.GetType("Int");
+                else return type_rigth;
             }
 
             if(comp_op.Contains(node.op))
             {
                 if (type_left.Name != "Int" || type_rigth.Name != "Int")
+                {
+                    Logger += "En la expresion " + node.ToString() + "-> error de compatibilidad de tipos (Int) \n";
                     return null;
+                }
                 else return Context.GetType("Bool");
             }
 
-            if(!basic_types.Contains(type_left.Name) || !basic_types.Contains(type_rigth.Name))
+            if (!basic_types.Contains(type_left.Name) || !basic_types.Contains(type_rigth.Name))
+            {
+                Logger += "En la expresion " + node.ToString() + "-> error de compatibilidad de tipos (NO TIPOS BUILT-IN) \n";
                 return null;
+            }
+
+            if(type_left.Name != type_rigth.Name)
+            {
+                Logger += "En la expresion " + node.ToString() + "-> error de compatibilidad de tipos (" + type_left.Name + " y " + type_rigth.Name + ")\n";
+                return null;
+            }
 
             return type_left;
 
@@ -68,183 +83,191 @@ namespace Logic.CheckSemantic
         
         public IType Visit(UnaryExpr node)
         {
-            return this.Visit(node.exp);
-            
+            IType type_exp = this.Visit(node.exp);
+
+            if(node.op == "~" && type_exp.Name != "Int")
+            {
+                Logger += "En la expresion " + node.ToString() + "-> error de compatibilidad de tipos (Int)\n";
+                return null;
+            }
+
+            else if(type_exp.Name != "Bool")
+            {
+                Logger += "En la expresion " + node.ToString() + "-> error de compatibilidad de tipos (Bool)\n";
+                return null;
+            }
+
+            return type_exp;
         }
 
         public IType Visit(Assign node)
         {
-            bool v_exp = this.Visit(node.exp);
-            IType type_exp = Context.GetType(node.exp.type.s);
+            IType type_exp = this.Visit(node.exp);
             IType type_id = Context.GetTypeFor(node.id.name);
 
-            if (!v_exp || !type_exp.Conform(type_id)) return false;
+            if (type_exp != null && type_exp != null && !type_exp.Conform(type_id))
+            {
+                Logger += "En la expresion " + node.ToString() + "-> error de conformidad de tipos\n";
+                return null;
+            }
 
-            return true;
+            return type_exp;
         }
 
         public IType Visit(Const node)
         {
             int num;
-            if ((node.type.s == "Int" && !int.TryParse(node.type.s, out num)) ||
-                (node.type.s == "Bool" && node.type.s != "true" && node.type.s != "false"))
-                return false;
-           
-            return true;
+
+            if (int.TryParse(node.name, out num))
+                return Context.GetType("Int");
+
+            if (node.type.s == "true" || node.type.s == "false")
+                return Context.GetType("Bool");
+
+            Logger += "En la expresion " + node.ToString() + "-> error de compatibilidad de tipos (no Int, no Bool)\n";
+            return null; 
         }
 
         public IType Visit(Lista<Node> node)
         {
-            foreach (Node cldr in node.children)
-            {
-                if (!this.Visit(cldr)) return false;
-            }
-            return true;
+            throw new NotImplementedException();
         }
 
         public IType Visit(Class_Def node)
         {
-            foreach (Node cldr in node.children)
-            {
-                Context.ActualType = Context.GetType(node.type.s);
-                if (!this.Visit(cldr)) return false;
-            }
-            return true;
+            foreach (var cldr in node.children)
+                this.Visit(cldr);
+            return null;
         }
 
         public IType Visit(Method_Def node)
         {
-            foreach (Node cldr in node.children)
-            {
-                if (!this.Visit(cldr)) return false;
-            }
-            IType type_exp = Context.GetType(node.exp.type.s);
+            IType type_exp = this.Visit(node.exp);
             IType type_return = Context.GetType(node.type.s);
-            if (!type_exp.Conform(type_return)) return false;
-            return true;
+
+            if (type_exp != null && type_return != null && !type_exp.Conform(type_return))
+            {
+                Logger += "En la expresion " + node.ToString() + "-> error de conformidad de tipos \n";
+                return null;
+            }
+
+            return type_return;
         }
 
         public IType Visit(Attr_Def node)
         {
-            if (!this.Visit(node.exp)) return false;
-
+            IType type_exp = this.Visit(node.exp);
             IType type_formal = Context.GetType(node.type.s);
-            IType type_exp = Context.GetType(node.exp.type.s);
-            if (!type_exp.Conform(type_formal)) return false;
 
-            return true;
+            if (type_exp != null && type_formal != null && !type_exp.Conform(type_formal))
+            {
+                Logger += "En la expresion " + node.ToString() + "-> error de conformidad de tipos \n";
+                return null;
+            }
+
+            return type_exp;
         }
 
         public IType Visit(Formal node)
         {
-            return true;
+            return Context.GetType(node.type.s);
         }
 
         public IType Visit(Type_cool node)
         {
-            return true;
+            return Context.GetType(node.s);
         }
         
         public IType Visit(Call_Method node)
         {
-            foreach (Expr exp in node.args.list_Node)
-                if (!this.Visit(exp))
+            Method m = Context.ActualType.GetMethod(node.name.name);
+            for (int i = 0; i < node.args.list_Node.Count; i++)
+            {
+                var exp = node.args.list_Node[i];
+                IType type = this.Visit(exp);
+
+                if (type != null && m.Arguments[i].Type != null && !type.Conform(m.Arguments[i].Type))
                 {
-                    node.type = null;
-                    return false;
+                    Logger += "En la expresion " + node.ToString() + "-> error de conformidad de tipos en el argumento " + (i + 1).ToString() + "\n";
+                    return null;
                 }
-            node.type = new Type_cool(Context.ActualType.GetMethod(node.name.name).ReturnType.Name);
-            return true;
+            }
+            return Context.GetType(m.ReturnType.Name);
+            
         }
 
         public IType Visit(Let_In node)
         {
             foreach (Node cld in node.attrs.list_Node)
-                if (!this.Visit(cld))
-                {
-                    node.type = null;
-                    return false;
-                }
-            if (!this.Visit(node.exp))
-            {
-                node.type = null;
-                return false;
-            }
-            node.type = node.exp.type;
-            return true;
+                this.Visit(cld);
+
+            return this.Visit(node.exp);
         }
 
         public IType Visit(If_Else node)
         {
-            if(!this.Visit(node.exp1) || !this.Visit(node.exp2) || !this.Visit(node.exp3))
-            {
-                node.type = null;
-                return false;
-            }
-            IType type_exp1 = Context.GetType(node.exp1.type.s);
-            IType type_exp2 = Context.GetType(node.exp2.type.s);
-            IType type_exp3 = Context.GetType(node.exp3.type.s);
+            IType type_exp1 = this.Visit(node.exp1);
+            IType type_exp2 = this.Visit(node.exp2);
+            IType type_exp3 = this.Visit(node.exp3);
 
-            if(type_exp1.Name != "Bool")
+            if (type_exp1.Name != "Bool")
             {
-                node.type = null;
-                return false;
+                Logger += "En la expresion " + node.ToString() + "-> error de compatibilidad de tipos (Bool) en la condicion \n";
+                return null;
             }
-            node.type = new Type_cool(type_exp2.LCA(type_exp3).Name);
-            return true;
+            return Context.GetType(type_exp2.LCA(type_exp3).Name);
         }
 
         public IType Visit(While_loop node)
         {
-            if (!this.Visit(node.exp1) || !this.Visit(node.exp2))
+            IType type_exp1 = this.Visit(node.exp1);
+            this.Visit(node.exp2);
+            if(type_exp1.Name != "Bool")
             {
-                node.type = null;
-                return false;
+                Logger += "En la expresion " + node.ToString() + "-> error de compatibilidad de tipos (Bool) en la condicion \n";
+                return null;
             }
-            node.type = new Type_cool("Object");
-            return true;
+            return Context.GetType("Object");
         }
 
         public IType Visit(Body node)
         {
-            if (!this.Visit(node.list))
-            {
-                node.type = null;
-                return true;
-            }
+            IType type = new IType("", null);
+            foreach (var exp in node.list.list_Node)
+                type = this.Visit(exp);
 
-            node.type = node.list.list_Node[node.list.list_Node.Count() - 1].type;
-            return true;
+            return type;
         }
 
         public IType Visit(New_type node)
         {
-            return true;
+            return Context.GetType(node.type.s);
         }
 
         public IType Visit(IsVoid node)
         {
-            return true;
+            return Context.GetType("Bool");
         }
 
         public IType Visit(Id node)
-        { 
-            return true;
+        {
+            return Context.GetTypeFor(node.name);
         }
 
         public IType Visit(Dispatch node)
         {
-            throw new NotImplementedException();
-            //bool v_call_method = this.Visit(node.call);
-            //bool v_exp = this.Visit(node.exp);
-
-//            bool conf = Context.GetType(node.exp.type.s).Conform(Context.GetType(node.caster.s))
-            
+            IType type_exp = this.Visit(node.exp);
+            if(type_exp != null && Context.GetType(node.s) != null && !type_exp.Conform(Context.GetType(node.s)))
+            {
+                Logger += "En la expresion " + node.ToString() + "-> error de conformidad de tipos en la expresion \n";
+                return null;
+            }
+            return this.Visit(node.call);
         }
 
         public IType Visit(Str node)
         {
-            throw new NotImplementedException();
+            return Context.GetType("String");
         }
     }
 }

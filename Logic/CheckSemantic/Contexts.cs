@@ -11,13 +11,13 @@ namespace Logic.CheckSemantic
     {
         public IType ActualType { get; set; }
 
-        public List<IType> Types { get; set; }
+        public Dictionary<string, IType> Types { get; set; }
 
         public Stack<Tuple<string, IType>> Symbols { get; set; }
 
-        public ContextType(List<IType> list)
+        public ContextType(Dictionary<string, IType> types)
         {
-            Types = list;
+            Types = types;
             Symbols = new Stack<Tuple<string, IType>>();
         }
 
@@ -29,12 +29,12 @@ namespace Logic.CheckSemantic
 
         public bool IsDefineType(string name)
         {
-            return Types.Select<IType, string>((t) => t.Name).Contains(name);
+            return Types.ContainsKey(name);
         }
 
         public void AddType(IType type)
         {
-            Types.Add(type);
+            Types[type.Name] = type;
         }
 
         public void DefineSymbol(string symbol, IType type)
@@ -44,8 +44,8 @@ namespace Logic.CheckSemantic
 
         public IType GetType(string type)
         {
-            foreach (IType t in Types)
-                if (t.Name == type) return t;
+            if (IsDefineType(type))
+                return Types[type];
 
             return null;
         }
