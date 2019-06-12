@@ -7,6 +7,7 @@ using Logic.CheckSemantic.Types;
 using AST;
 using Logic;
 using Logic.CheckSemantic;
+using System.IO;
 
 namespace Compiler
 {
@@ -14,10 +15,9 @@ namespace Compiler
     {
         static void Main(string[] args)
         {
-            string text = @" 
-                    class Sheila {
-                                edad : Bool <- true ;
-                                                                        };";
+            StreamReader x = new StreamReader("a.txt");
+            string text = x.ReadToEnd();
+            
 
 
             AST.Program ast = (AST.Program) GetAST.Show(text);

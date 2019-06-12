@@ -18,7 +18,14 @@ namespace Logic.CheckSemantic
 
         public IType Visit(Node node)
         {
-            throw new NotImplementedException();
+            if (node is Program) return this.Visit((Program)node);
+            if (node is Expr) return this.Visit((Expr)node);
+            if (node is Class_Def) return this.Visit((Class_Def)node);
+            if (node is Method_Def) return this.Visit((Method_Def)node);
+            if (node is Attr_Def) return this.Visit((Attr_Def)node);
+            if (node is Formal) return this.Visit((Formal)node);
+            if (node is Type_cool) return this.Visit((Type_cool)node);
+            return this.Visit((Call_Method)node);
         }
 
         public IType Visit(Program node)
@@ -157,7 +164,7 @@ namespace Logic.CheckSemantic
             }
             foreach (var cldr in node.method.list_Node)
             {
-                Context.ActualType = Context.GetType(cldr.type.s);
+                Context.ActualType = Context.GetType(node.type.s);
                 this.Visit(cldr);
             }
             return null;
