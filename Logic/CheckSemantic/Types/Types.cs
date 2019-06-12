@@ -173,7 +173,10 @@ namespace Logic.CheckSemantic.Types
                 types[Class.type.s] = new IType(Class.type.s, null);
 
             foreach (Class_Def Class in Ast.list)
-                types[Class.type.s].Father = types[Class.inherit_type.s];
+            {
+                if (Class.inherit_type.s == "") types[Class.type.s].Father = types["Object"];
+                else types[Class.type.s].Father = types[Class.inherit_type.s];
+            }
 
             foreach (Class_Def Class in Ast.list)
             {

@@ -105,7 +105,7 @@ namespace Logic
 
             string father;
             if (context.TYPE().Length > 1) father = context.TYPE(1).GetText();
-            else father = "object";
+            else father = "Object";
 
             return new Class_Def(new Type_cool(context.TYPE(0).GetText()), new Type_cool(father), new Lista<Method_Def>(met), new Lista<Attr_Def>(attr));
         }
@@ -123,14 +123,13 @@ namespace Logic
         public override Node VisitMethod([NotNull] coolgrammarParser.MethodContext context)
         {
             List<Formal> args = new List<Formal>();
-            Id id = (Id)Visit(context.ID());
             foreach (var item in context.args_def().formal())
             {
                 var v = Visit(item);
                 args.Add((Formal)v);
             }
             Expr exp = (Expr)Visit(context.expr());
-            return new Method_Def(id, new Type_cool(context.TYPE().GetText()), new Lista<Formal>(args), exp);
+            return new Method_Def(new Id(context.ID().GetText()), new Type_cool(context.TYPE().GetText()), new Lista<Formal>(args), exp);
         }
 
         public override Node VisitAttr([NotNull] coolgrammarParser.AttrContext context)

@@ -14,7 +14,7 @@ namespace Logic.CheckSemantic
 
         public string Logger;
 
-        public TypeCheckerVisitor(ContextType cxt) { Context = cxt; }
+        public TypeCheckerVisitor(ContextType cxt) { Context = cxt; Logger = ""; }
 
         public IType Visit(Node node)
         {
@@ -24,22 +24,35 @@ namespace Logic.CheckSemantic
         public IType Visit(Program node)
         {
             foreach (Class_Def cldr in node.list)
-            {
-                Context.ActualType = Context.GetType(cldr.type.s);
                 this.Visit(cldr);
-            }
+
             return null;
         }
 
         public IType Visit(Expr node)
         {
-            throw new NotImplementedException();
+            if (node is Call_Method) return this.Visit((Call_Method)node);
+            if (node is Dispatch) return this.Visit((Dispatch)node);
+            if (node is Str) return this.Visit((Str)node);
+            if (node is Let_In) return this.Visit((Let_In)node);
+            if (node is If_Else) return this.Visit((If_Else)node);
+            if (node is While_loop) return this.Visit((While_loop)node);
+            if (node is Body) return this.Visit((Body)node);
+            if (node is New_type) return this.Visit((New_type)node);
+            if (node is IsVoid) return this.Visit((IsVoid)node);
+            if (node is BinaryExpr) return this.Visit((BinaryExpr)node);
+            if (node is UnaryExpr) return this.Visit((UnaryExpr)node);
+            if (node is Assign) return this.Visit((Assign)node);
+            if (node is Id) return this.Visit((Id)node);
+            else return this.Visit((Const)node);
         }
 
         public IType Visit(BinaryExpr node)
         {
             IType type_left = this.Visit(node.left);
             IType type_rigth = this.Visit(node.right);
+
+            if (type_left == null || type_rigth == null) return null;
 
             List<string> arith_op = new List<string> { "+", "-", "*", "/" };
             List<string> comp_op = new List<string> { "<", "<=" };
@@ -57,6 +70,7 @@ namespace Logic.CheckSemantic
 
             if(comp_op.Contains(node.op))
             {
+                
                 if (type_left.Name != "Int" || type_rigth.Name != "Int")
                 {
                     Logger += "En la expresion " + node.ToString() + "-> error de compatibilidad de tipos (Int) \n";
@@ -84,6 +98,7 @@ namespace Logic.CheckSemantic
         public IType Visit(UnaryExpr node)
         {
             IType type_exp = this.Visit(node.exp);
+            if (type_exp == null) return null;
 
             if(node.op == "~" && type_exp.Name != "Int")
             {
@@ -105,7 +120,7 @@ namespace Logic.CheckSemantic
             IType type_exp = this.Visit(node.exp);
             IType type_id = Context.GetTypeFor(node.id.name);
 
-            if (type_exp != null && type_exp != null && !type_exp.Conform(type_id))
+            if (type_exp != null && type_id != null && !type_exp.Conform(type_id))
             {
                 Logger += "En la expresion " + node.ToString() + "-> error de conformidad de tipos\n";
                 return null;
@@ -121,7 +136,7 @@ namespace Logic.CheckSemantic
             if (int.TryParse(node.name, out num))
                 return Context.GetType("Int");
 
-            if (node.type.s == "true" || node.type.s == "false")
+            if (node.name == "true" || node.name == "false")
                 return Context.GetType("Bool");
 
             Logger += "En la expresion " + node.ToString() + "-> error de compatibilidad de tipos (no Int, no Bool)\n";
@@ -135,8 +150,16 @@ namespace Logic.CheckSemantic
 
         public IType Visit(Class_Def node)
         {
-            foreach (var cldr in node.children)
+            foreach (var cldr in node.attr.list_Node)
+            {
+                Context.ActualType = Context.GetType(node.type.s);
                 this.Visit(cldr);
+            }
+            foreach (var cldr in node.method.list_Node)
+            {
+                Context.ActualType = Context.GetType(cldr.type.s);
+                this.Visit(cldr);
+            }
             return null;
         }
 
@@ -210,6 +233,8 @@ namespace Logic.CheckSemantic
             IType type_exp2 = this.Visit(node.exp2);
             IType type_exp3 = this.Visit(node.exp3);
 
+            if (type_exp1 == null || type_exp2 == null || type_exp3 == null) return null;
+
             if (type_exp1.Name != "Bool")
             {
                 Logger += "En la expresion " + node.ToString() + "-> error de compatibilidad de tipos (Bool) en la condicion \n";
@@ -221,6 +246,9 @@ namespace Logic.CheckSemantic
         public IType Visit(While_loop node)
         {
             IType type_exp1 = this.Visit(node.exp1);
+
+            if (type_exp1 == null) return null;
+
             this.Visit(node.exp2);
             if(type_exp1.Name != "Bool")
             {

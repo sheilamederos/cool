@@ -15,16 +15,9 @@ namespace Compiler
         static void Main(string[] args)
         {
             string text = @" 
-                    class Sheila inherits Persona {
-                                edad : Int <- 34 ;
-                                mujer : Bool <- true;
-                                novio: Persona <- new Persona;
-                                metodo1() : Int { {
-                                        while i < 0 loop i <- i - 1 pool;
-                                        i ;
-                                } };
-
-                                        };";
+                    class Sheila {
+                                edad : Bool <- true ;
+                                                                        };";
 
 
             AST.Program ast = (AST.Program) GetAST.Show(text);
