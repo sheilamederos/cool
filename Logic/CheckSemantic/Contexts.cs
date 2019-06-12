@@ -57,5 +57,10 @@ namespace Logic.CheckSemantic
 
             return null; 
         }
+
+        public void UndefineSymbol()
+        {
+            Symbols.Pop();
+        }
     }
 }

@@ -86,7 +86,9 @@ namespace Logic.CheckSemantic.Types
             if (Father != null)
                 list = Father.AllAttributes();
 
-            list.Concat<Attribute>(Attributes);
+            foreach (var item in Attributes)
+                list.Add(item);
+
             return list;
         }
 
@@ -103,8 +105,10 @@ namespace Logic.CheckSemantic.Types
             List<Method> list = new List<Method>();
             if (Father != null)
                 list = Father.AllMethods();
-            
-            list.Concat<Method>(Methods);
+
+            foreach (var item in Methods)
+                list.Add(item);
+
             return list;
         }
 
@@ -113,7 +117,9 @@ namespace Logic.CheckSemantic.Types
             foreach (Method mtd in AllMethods())
                 if (name == mtd.Name) return mtd;
 
-            return null;
+            if (Father == null) return null;
+
+            return Father.GetMethod(name);
         }
 
         public IType LCA(IType other)
