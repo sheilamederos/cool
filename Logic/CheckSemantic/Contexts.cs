@@ -44,6 +44,7 @@ namespace Logic.CheckSemantic
 
         public IType GetType(string type)
         {
+            if (type == "SELF_TYPE") type = ActualType.Name;
             if (IsDefineType(type))
                 return Types[type];
 

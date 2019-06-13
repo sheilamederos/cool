@@ -30,9 +30,8 @@ namespace Logic
     {
         public override Node VisitAssign([NotNull] coolgrammarParser.AssignContext context)
         {
-            Id id = (Id)Visit(context.ID());
             Expr r = (Expr)Visit(context.expr());
-            return new Assign(id, r);
+            return new Assign(new Id(context.ID().GetText()), r);
         }
         
 
@@ -135,8 +134,13 @@ namespace Logic
         public override Node VisitAttr([NotNull] coolgrammarParser.AttrContext context)
         {
             var a = (Formal)Visit(context.formal());
-            var exp = (Expr)Visit(context.expr());
-            return new Attr_Def(a.name, a.type, exp);
+
+            if (context.ChildCount > 1)
+            {
+                var exp = (Expr)Visit(context.expr());
+                return new Attr_Def(a.name, a.type, exp);
+            }
+            return new Attr_Def(a.name, a.type, null);
         }
 
         public override Node VisitFormal([NotNull] coolgrammarParser.FormalContext context)

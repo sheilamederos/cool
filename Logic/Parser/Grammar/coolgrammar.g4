@@ -11,7 +11,7 @@ feature : attr											# f_attr
 
 method  : ID '(' args_def ')' ':' TYPE '{' expr '}' ;						
 
-attr    : formal ( '<-' expr)? ;																							
+attr    : formal ('<-' expr)? ;																							
 
 formal  : ID ':' TYPE ;
 

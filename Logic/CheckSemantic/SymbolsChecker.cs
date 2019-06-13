@@ -8,27 +8,33 @@ using AST;
 namespace Logic.CheckSemantic
 {
     //ver si estan definidos los tipos de las variables
-    public class VarCheckerVisitor : IVisitorAST<bool>
+    public class SymCheckerVisitor : IVisitorAST<bool>
     {
         ContextType Context; //tipos, metodos, atributos
 
-        public VarCheckerVisitor(ContextType context)
+        public SymCheckerVisitor(ContextType context)
         {
             Context = context;
         }
 
         public bool Visit(Node node)
         {
-            throw new NotImplementedException();
+            if (node is Program) return this.Visit((Program)node);
+            if (node is Expr) return this.Visit((Expr)node);
+            if (node is Class_Def) return this.Visit((Class_Def)node);
+            if (node is Method_Def) return this.Visit((Method_Def)node);
+            if (node is Attr_Def) return this.Visit((Attr_Def)node);
+            if (node is Formal) return this.Visit((Formal)node);
+            if (node is Type_cool) return this.Visit((Type_cool)node);
+            return this.Visit((Call_Method)node);
         }
 
         public bool Visit(Program node)
         {
-            foreach (Node cld in node.children)
-            {
-                return true;
-            }
-            return false;
+            foreach (Class_Def cldr in node.list)
+                if (!this.Visit(cldr)) return false;
+
+            return true;
         }
 
         public bool Visit(Expr node)

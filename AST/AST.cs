@@ -361,7 +361,7 @@ namespace AST
     {
         public Id id;
         public Expr exp;
-        public Assign(Id id, Expr exp) : base (new Node[] { exp})
+        public Assign(Id id, Expr exp) : base (new Node[] { id, exp})
         {
             this.id = id;
             this.exp = exp;

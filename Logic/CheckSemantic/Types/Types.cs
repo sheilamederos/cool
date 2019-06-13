@@ -134,7 +134,7 @@ namespace Logic.CheckSemantic.Types
             List<IType> types = new List<IType>();
 
             IType TObject = new IType("Object", null);
-            IType TSelfType = new IType("SelfType", TObject);
+            IType TSelfType = new IType("SELF_TYPE", TObject);
             IType TInt = new IType("Int", TObject);
             IType TString = new IType("String", TObject);
             IType TBool = new IType("Bool", TObject);
