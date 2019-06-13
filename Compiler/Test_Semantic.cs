@@ -28,6 +28,10 @@ namespace Compiler
             var TypeCheck = new TypeCheckerVisitor(context);
             TypeCheck.Visit(ast);
             Console.WriteLine(TypeCheck.Logger);
+            context = new ContextType(types);
+            var SymChecker = new SymCheckerVisitor(context);
+            Console.WriteLine(SymChecker.Visit(ast));
+            Console.WriteLine(SymChecker.Logger);
         }
     }
 }

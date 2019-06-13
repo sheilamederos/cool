@@ -48,7 +48,7 @@
     <Compile Include="CheckSemantic\DefinitionsChecker.cs" />
     <Compile Include="CheckSemantic\TypesContext.cs" />
     <Compile Include="CheckSemantic\Types\Types.cs" />
-    <Compile Include="CheckSemantic\VarChecker.cs" />
+    <Compile Include="CheckSemantic\SymbolsChecker.cs" />
     <Compile Include="Transpiler.cs" />
     <Compile Include="Parser\Grammar\coolgrammarBaseVisitor.cs" />
     <Compile Include="Parser\Grammar\coolgrammarLexer.cs" />

@@ -4,17 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AST;
+using Logic.CheckSemantic.Types;
 
 namespace Logic.CheckSemantic
 {
-    //ver si estan definidos los tipos de las variables
     public class SymCheckerVisitor : IVisitorAST<bool>
     {
-        ContextType Context; //tipos, metodos, atributos
+        ContextType Context; 
+
+        public string Logger;
 
         public SymCheckerVisitor(ContextType context)
         {
             Context = context;
+            Logger = "";
         }
 
         public bool Visit(Node node)
@@ -31,6 +34,7 @@ namespace Logic.CheckSemantic
 
         public bool Visit(Program node)
         {
+            Context.DefineSymbol("self", Context.GetSelf_Type());
             foreach (Class_Def cldr in node.list)
                 if (!this.Visit(cldr)) return false;
 
@@ -39,11 +43,20 @@ namespace Logic.CheckSemantic
 
         public bool Visit(Expr node)
         {
-            foreach (Node cld in node.children)
-            {
-                return true;
-            }
-            return false;
+            if (node is Call_Method) return this.Visit((Call_Method)node);
+            if (node is Dispatch) return this.Visit((Dispatch)node);
+            if (node is Str) return this.Visit((Str)node);
+            if (node is Let_In) return this.Visit((Let_In)node);
+            if (node is If_Else) return this.Visit((If_Else)node);
+            if (node is While_loop) return this.Visit((While_loop)node);
+            if (node is Body) return this.Visit((Body)node);
+            if (node is New_type) return this.Visit((New_type)node);
+            if (node is IsVoid) return this.Visit((IsVoid)node);
+            if (node is BinaryExpr) return this.Visit((BinaryExpr)node);
+            if (node is UnaryExpr) return this.Visit((UnaryExpr)node);
+            if (node is Assign) return this.Visit((Assign)node);
+            if (node is Id) return this.Visit((Id)node);
+            else return this.Visit((Const)node);
         }
 
         public bool Visit(BinaryExpr node)
@@ -58,8 +71,13 @@ namespace Logic.CheckSemantic
 
         public bool Visit(Assign node)
         {
-            throw new NotImplementedException();
-            //Context. node.id
+            bool solve = true;
+            if (!Context.IsDefineSymbol(node.id.name))
+            {
+                solve = false;
+                Logger += "En la expresion " + node.ToString() + "-> error de identificador ('" + node.id.name +"' no esta definido) \n";
+            }
+            return solve && this.Visit(node.exp);
         }
 
         public bool Visit(Const node)
@@ -74,22 +92,62 @@ namespace Logic.CheckSemantic
 
         public bool Visit(Class_Def node)
         {
-            throw new NotImplementedException();
+            Context.ActualType = Context.GetType(node.type.s);
+            List<string> id_defines = new List<string>();
+            foreach (var attr in node.attr.list_Node)
+            {
+                if (id_defines.Contains(attr.name.name))
+                {
+                    Logger += "En la expresion " + node.ToString() + "-> error de identificador ('" + attr.name.name + "' ya esta definido) \n";
+                }
+                else
+                {
+                    id_defines.Add(attr.name.name);
+                    Context.DefineSymbol(attr.name.name, Context.GetType(attr.type.s));
+                }
+            }
+            foreach (Node cld in node.children)
+                if (!this.Visit(cld)) return false;
+
+            Context.UndefineSymbol(id_defines.Count);
+
+            return true;
         }
 
         public bool Visit(Method_Def node)
         {
-            throw new NotImplementedException();
+            bool solve = true;
+            List<string> id_defines = new List<string>();
+            foreach (var arg in node.args.list_Node)
+            {
+                if (id_defines.Contains(arg.name.name))
+                {
+                    Logger += "En la expresion " + node.ToString() + "-> error de identificador ('" + arg.name.name + "' ya esta definido) \n";
+                    solve = false;
+                }
+                else
+                {
+                    id_defines.Add(arg.name.name);
+                    Context.DefineSymbol(arg.name.name, Context.GetType(arg.type.s));
+                }
+            }
+
+            solve &= this.Visit(node.exp);
+
+            Context.UndefineSymbol(id_defines.Count);
+
+            return solve;
         }
 
         public bool Visit(Attr_Def node)
         {
-            throw new NotImplementedException();
+            if (node == null) return true;
+            return this.Visit(node.exp);
         }
 
         public bool Visit(Formal node)
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         public bool Visit(Type_cool node)
@@ -99,52 +157,85 @@ namespace Logic.CheckSemantic
 
         public bool Visit(Call_Method node)
         {
-            throw new NotImplementedException();
+            bool solve = true;
+            foreach (var arg in node.args.list_Node)
+            {
+                solve &= this.Visit(arg);
+            }
+            if (!Context.IsDefineMethod(node.name.name, Context.ActualType))
+            {
+                Logger += "En la expresion " + node.ToString() + "-> error de identificador (metodo '" + node.name.name + "' no esta definido) \n";
+                solve = false;
+            }
+            return solve;
         }
 
         public bool Visit(Let_In node)
         {
-            throw new NotImplementedException();
+            bool solve = true;
+            List<string> id_defines = new List<string>();
+            foreach (var attr in node.attrs.list_Node)
+            {
+                if (id_defines.Contains(attr.name.name))
+                {
+                    Logger += "En la expresion " + node.ToString() + "-> error de identificador ('" + attr.name.name + "' ya esta definido) \n";
+                    solve = false;
+                }
+                else
+                {
+                    id_defines.Add(attr.name.name);
+                    Context.DefineSymbol(attr.name.name, Context.GetType(attr.type.s));
+                }
+            }
+
+            solve &= this.Visit(node.exp);
+
+            Context.UndefineSymbol(id_defines.Count);
+
+            return solve;
         }
 
         public bool Visit(If_Else node)
         {
-            throw new NotImplementedException();
+            return this.Visit(node.exp1) && this.Visit(node.exp2) && this.Visit(node.exp3);
         }
 
         public bool Visit(While_loop node)
         {
-            throw new NotImplementedException();
+            return this.Visit(node.exp1) && this.Visit(node.exp2);
         }
 
         public bool Visit(Body node)
         {
-            throw new NotImplementedException();
+            foreach (var exp in node.list.list_Node)
+                if (!this.Visit(exp)) return false;
+
+            return true;
         }
 
         public bool Visit(New_type node)
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         public bool Visit(IsVoid node)
         {
-            throw new NotImplementedException();
+            return this.Visit(node.exp);
         }
 
         public bool Visit(Id node)
         {
-            throw new NotImplementedException();
+            return Context.IsDefineSymbol(node.name);
         }
 
         public bool Visit(Dispatch node)
         {
-            throw new NotImplementedException();
+            return this.Visit(node.exp) && this.Visit(node.call);
         }
 
         public bool Visit(Str node)
         {
-            throw new NotImplementedException();
+            return true;
         }
     }
 }
