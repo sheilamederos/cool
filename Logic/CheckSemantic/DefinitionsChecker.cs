@@ -151,7 +151,7 @@ namespace Logic.CheckSemantic
         public bool Visit(Dispatch node)
         {
             bool solve = true;
-            if(node.s != "sin castear")
+            if(node.s != "sin castear ")
             {
                 solve &= Visit(new Type_cool(node.s));
             }

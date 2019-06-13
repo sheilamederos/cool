@@ -34,7 +34,6 @@ namespace Logic.CheckSemantic
 
         public bool Visit(Program node)
         {
-            Context.DefineSymbol("self", Context.GetSelf_Type());
             foreach (Class_Def cldr in node.list)
                 if (!this.Visit(cldr)) return false;
 
@@ -94,6 +93,7 @@ namespace Logic.CheckSemantic
         {
             bool solve = true; 
             Context.ActualType = Context.GetType(node.type.s);
+            Context.DefineSymbol("self", Context.ActualType);
             List<string> id_defines = new List<string>();
             foreach (var attr in node.attr.list_Node)
             {
@@ -260,7 +260,25 @@ namespace Logic.CheckSemantic
 
         public bool Visit(Dispatch node)
         {
-            return this.Visit(node.exp) && this.Visit(node.call);
+            bool solve = this.Visit(node.exp);
+            if (node.s != "sin castear ")
+            {
+                IType type = Context.ActualType;
+                Context.ActualType = Context.GetType(node.s);
+                solve &= this.Visit(node.call);
+                Context.ActualType = type;
+            }
+            else
+            {
+                IType type = Context.ActualType;
+                var type_checker = new TypeCheckerVisitor(Context);
+                Context.ActualType = type_checker.Visit(node.exp);
+                if (Context.ActualType == null) solve = false;
+                else solve &= this.Visit(node.call);
+                Context.ActualType = type;
+            }
+
+            return solve;
         }
 
         public bool Visit(Str node)

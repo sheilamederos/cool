@@ -47,11 +47,6 @@ namespace Logic.CheckSemantic
             Symbols.Push(new Tuple<string, IType>(symbol, type));
         }
 
-        public IType GetSelf_Type()
-        {
-            return Types["SELF_TYPE"];
-        }
-
         public IType GetType(string type)
         {
             if (type == "SELF_TYPE") type = ActualType.Name;

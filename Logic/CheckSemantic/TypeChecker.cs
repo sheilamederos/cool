@@ -30,7 +30,6 @@ namespace Logic.CheckSemantic
 
         public IType Visit(Program node)
         {
-            Context.DefineSymbol("self", Context.GetSelf_Type());
             foreach (Class_Def cldr in node.list)
                 this.Visit(cldr);
 
@@ -110,8 +109,7 @@ namespace Logic.CheckSemantic
                 Logger += "En la expresion " + node.ToString() + "-> error de tipos (La expresion no es Int)\n";
                 return null;
             }
-
-            else if(type_exp.Name != "Bool")
+            else if(node.op == "not" && type_exp.Name != "Bool")
             {
                 Logger += "En la expresion " + node.ToString() + "-> error de tipos (La expresion no es Bool)\n";
                 return null;
@@ -156,6 +154,7 @@ namespace Logic.CheckSemantic
         public IType Visit(Class_Def node)
         {
             Context.ActualType = Context.GetType(node.type.s);
+            Context.DefineSymbol("self", Context.ActualType);
             foreach (var cldr in node.attr.list_Node)
             {
                 IType t = this.Visit(cldr);
