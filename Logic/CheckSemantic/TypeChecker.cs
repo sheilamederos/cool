@@ -92,9 +92,9 @@ namespace Logic.CheckSemantic
                 Logger += "En la expresion " + node.ToString() + "-> error de tipos (Las expresiones no tienen el mismo tipo built-in) \n";
             }
 
-            if(type_left.Name != type_rigth.Name)
+            if(!(Context.GetType(type_left.Name).Conform(Context.GetType(type_rigth.Name))) || !Context.GetType(type_rigth.Name).Conform(Context.GetType(type_left.Name)))
             {
-                Logger += "En la expresion " + node.ToString() + "-> error de tipos (Las expresiones no tienen el mismo tipo)\n";
+                Logger += "En la expresion " + node.ToString() + "-> error de tipos (Las expresiones no tienen tipos conformables)\n";
             }
 
             return Context.GetType("Bool");

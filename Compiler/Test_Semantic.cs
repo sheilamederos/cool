@@ -23,15 +23,27 @@ namespace Compiler
             AST.Program ast = (AST.Program) GetAST.Show(text);
             Program.DFS(ast);
 
-            Dictionary<string, IType> types = IType.GetAllTypes(ast);
-            ContextType context = new ContextType(types);
-            var TypeCheck = new TypeCheckerVisitor(context);
-            TypeCheck.Visit(ast);
-            Console.WriteLine(TypeCheck.Logger);
-            context = new ContextType(types);
-            var SymChecker = new SymCheckerVisitor(context);
-            Console.WriteLine(SymChecker.Visit(ast));
-            Console.WriteLine(SymChecker.Logger);
+            var DefChecker = new DefinitionsChecker();
+            bool check = DefChecker.Visit(ast);
+            Console.WriteLine(DefChecker.Logger);
+            if (check)
+            {
+                Console.WriteLine("Definiciones OK");
+                Dictionary<string, IType> types = IType.GetAllTypes(ast);
+                ContextType context = new ContextType(types);
+                var TypeCheck = new TypeCheckerVisitor(context);
+                TypeCheck.Visit(ast);
+                Console.WriteLine(TypeCheck.Logger);
+
+                context = new ContextType(types);
+                var SymChecker = new SymCheckerVisitor(context);
+                Console.WriteLine(SymChecker.Visit(ast));
+                Console.WriteLine(SymChecker.Logger);
+            }
+            else
+            {
+                Console.WriteLine("Definiciones al berro");
+            }
         }
     }
 }
