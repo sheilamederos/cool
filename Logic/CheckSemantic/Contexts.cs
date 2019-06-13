@@ -79,7 +79,7 @@ namespace Logic.CheckSemantic
             if (count > 0)
             {
                 UndefineSymbol();
-                UndefineSymbol(count--);
+                UndefineSymbol(--count);
             }
         }
 
@@ -111,6 +111,11 @@ namespace Logic.CheckSemantic
                     break;
                 }
             }
+        }
+
+        public void UndefineMethods()
+        {
+            Methods = new List<Method>();
         }
     }
 }

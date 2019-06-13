@@ -92,12 +92,14 @@ namespace Logic.CheckSemantic
 
         public bool Visit(Class_Def node)
         {
+            bool solve = true; 
             Context.ActualType = Context.GetType(node.type.s);
             List<string> id_defines = new List<string>();
             foreach (var attr in node.attr.list_Node)
             {
                 if (id_defines.Contains(attr.name.name) || Context.ActualType.Father.GetAttribute(attr.name.name) != null)
                 {
+                    solve = false;
                     Logger += "En la expresion " + node.ToString() + "-> error de identificador ('" + attr.name.name + "' ya esta definido) \n";
                 }
                 else
@@ -110,6 +112,7 @@ namespace Logic.CheckSemantic
             {
                 if (Context.ThereAreMethod(mtd.name.name))
                 {
+                    solve = false;
                     Logger += "En la expresion " + node.ToString() + "-> error de identificador (metodo '" + mtd.name.name + "' ya esta definido) \n";
                 }
                 else
@@ -117,20 +120,23 @@ namespace Logic.CheckSemantic
                     Context.DefineMethod(mtd.name.name, Context.GetType(node.type.s));
                 }
                 Method mtd_father = Context.ActualType.Father.GetMethod(mtd.name.name);
-                if (mtd_father != null && Method.Equal_Def(mtd, mtd_father))
+                if (mtd_father != null && !Method.Equal_Def(mtd, mtd_father))
                 {
+                    solve = false;
                     Logger += "En la expresion " + node.ToString() + "-> error de identificador (metodo '" + mtd.name.name + "' esta definido con elementos diferentes en un tipo mayor) \n";
                 }
             }
             foreach (var cld in node.attr.list_Node)
-                if (!this.Visit(cld)) return false;
+                if (!this.Visit(cld)) solve = false;
 
             foreach (var cld in node.method.list_Node)
-                if (!this.Visit(cld)) return false;
+                if (!this.Visit(cld)) solve = false;
 
             Context.UndefineSymbol(id_defines.Count);
 
-            return true;
+            Context.UndefineMethods();
+
+            return solve;
         }
 
         public bool Visit(Method_Def node)
