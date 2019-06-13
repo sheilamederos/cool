@@ -106,6 +106,22 @@ namespace Logic.CheckSemantic
                     Context.DefineSymbol(attr.name.name, Context.GetType(attr.type.s));
                 }
             }
+            foreach (var mtd in node.method.list_Node)
+            {
+                if (Context.ThereAreMethod(mtd.name.name))
+                {
+                    Logger += "En la expresion " + node.ToString() + "-> error de identificador (metodo '" + mtd.name.name + "' ya esta definido) \n";
+                }
+                else
+                {
+                    Context.DefineMethod(mtd.name.name, Context.GetType(node.type.s));
+                }
+                Method mtd_father = Context.ActualType.Father.GetMethod(mtd.name.name);
+                if (mtd_father != null && Method.Equal_Def(mtd, mtd_father))
+                {
+                    Logger += "En la expresion " + node.ToString() + "-> error de identificador (metodo '" + mtd.name.name + "' esta definido con elementos diferentes en un tipo mayor) \n";
+                }
+            }
             foreach (var cld in node.attr.list_Node)
                 if (!this.Visit(cld)) return false;
 

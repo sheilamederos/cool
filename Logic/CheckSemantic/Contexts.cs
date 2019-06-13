@@ -13,12 +13,15 @@ namespace Logic.CheckSemantic
 
         public Dictionary<string, IType> Types { get; set; }
 
+        public List<Method> Methods { get; set; }
+
         public Stack<Tuple<string, IType>> Symbols { get; set; }
 
         public ContextType(Dictionary<string, IType> types)
         {
             Types = types;
             Symbols = new Stack<Tuple<string, IType>>();
+            Methods = new List<Method>();
         }
 
         public bool IsDefineSymbol(string name)
@@ -80,9 +83,34 @@ namespace Logic.CheckSemantic
             }
         }
 
-        internal bool IsDefineMethod(string name, IType type)
+        public bool IsDefineMethod(string name, IType type)
         {
-            return type.AllMethods().Select<Method, string>((m) => m.Name).Contains(name);
+            foreach (var item in type.AllMethods())
+            {
+                if (item.Name == name) return true;
+            }
+            return false;
+        }
+
+        public bool ThereAreMethod(string name)
+        {
+            foreach (var item in Methods)
+            {
+                if (item.Name == name) return true;
+            }
+            return false;
+        }
+
+        public void DefineMethod(string m, IType type)
+        {
+            foreach (var item in type.Methods)
+            {
+                if(item.Name == m)
+                {
+                    Methods.Add(item);
+                    break;
+                }
+            }
         }
     }
 }

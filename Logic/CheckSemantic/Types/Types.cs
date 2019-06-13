@@ -43,6 +43,18 @@ namespace Logic.CheckSemantic.Types
             Arguments = attr;
             TypeSelf = typeSelf;
         }
+
+        public static bool Equal_Def(Method_Def mtd, Method mtd_father)
+        {
+            if (mtd.type.s != mtd_father.ReturnType.Name) return false;
+            if (mtd.args.list_Node.Count != mtd_father.Arguments.Count) return false;
+            for (int i = 0; i < mtd.args.list_Node.Count; i++)
+            {
+                if (mtd.args.list_Node[i].type.s != mtd_father.Arguments[i].Type.Name)
+                    return false;
+            }
+            return true;
+        }
     }
 
     public class IType
