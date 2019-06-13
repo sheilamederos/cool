@@ -96,7 +96,7 @@ namespace Logic.CheckSemantic
             List<string> id_defines = new List<string>();
             foreach (var attr in node.attr.list_Node)
             {
-                if (id_defines.Contains(attr.name.name))
+                if (id_defines.Contains(attr.name.name) || Context.ActualType.Father.GetAttribute(attr.name.name) != null)
                 {
                     Logger += "En la expresion " + node.ToString() + "-> error de identificador ('" + attr.name.name + "' ya esta definido) \n";
                 }
@@ -106,7 +106,10 @@ namespace Logic.CheckSemantic
                     Context.DefineSymbol(attr.name.name, Context.GetType(attr.type.s));
                 }
             }
-            foreach (Node cld in node.children)
+            foreach (var cld in node.attr.list_Node)
+                if (!this.Visit(cld)) return false;
+
+            foreach (var cld in node.method.list_Node)
                 if (!this.Visit(cld)) return false;
 
             Context.UndefineSymbol(id_defines.Count);
@@ -225,7 +228,12 @@ namespace Logic.CheckSemantic
 
         public bool Visit(Id node)
         {
-            return Context.IsDefineSymbol(node.name);
+            if (!Context.IsDefineSymbol(node.name))
+            {
+                Logger += "En la expresion " + node.ToString() + "-> error de identificador ('" + node.name + "' no esta definido) \n";
+                return false;
+            }
+            return true;
         }
 
         public bool Visit(Dispatch node)

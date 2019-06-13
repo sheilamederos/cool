@@ -23,8 +23,10 @@ namespace Logic.CheckSemantic
 
         public bool IsDefineSymbol(string name)
         {
-            List<string> list = (List<string>)Symbols.Select<Tuple<string, IType>, string>((t) => t.Item1);
-            return list.Contains(name);
+
+            foreach (var t in Symbols)
+                if (t.Item1 == name) return true;
+            return false;
         }
 
         public bool IsDefineType(string name)
@@ -71,8 +73,11 @@ namespace Logic.CheckSemantic
 
         public void UndefineSymbol(int count)
         {
-            UndefineSymbol();
-            UndefineSymbol(count--);
+            if (count > 0)
+            {
+                UndefineSymbol();
+                UndefineSymbol(count--);
+            }
         }
 
         internal bool IsDefineMethod(string name, IType type)
