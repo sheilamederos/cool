@@ -32,7 +32,7 @@
   <ItemGroup>
     <Reference Include="Antlr4.Runtime.Standard, Version=4.7.0.0, Culture=neutral, PublicKeyToken=e78b2c5abd1fcb3f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\Antlr4.Runtime.Standard.dll</HintPath>
+      <HintPath>..\Compiler\bin\Debug\Antlr4.Runtime.Standard.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -46,8 +46,6 @@
   <ItemGroup>
     <Compile Include="CheckSemantic\Contexts.cs" />
     <Compile Include="CheckSemantic\DefinitionsChecker.cs" />
-    <Compile Include="CheckSemantic\TypesContext.cs" />
-    <Compile Include="CheckSemantic\Types\Types.cs" />
     <Compile Include="CheckSemantic\SymbolsChecker.cs" />
     <Compile Include="Transpiler.cs" />
     <Compile Include="Parser\Grammar\coolgrammarBaseVisitor.cs" />
