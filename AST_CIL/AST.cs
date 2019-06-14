@@ -1,255 +1,421 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 
 namespace AST_CIL
 {
-    public class OneType
+    public abstract class CIL_Node
+    {
+        public int dir;
+        public virtual void Accept(IVisitor visitor) => visitor.Accept(this);
+    }
+
+    public class CIL_Program : CIL_Node
+    {
+        public CIL_Code Code;
+        public CIL_Data Data;
+        public CIL_Types Types;
+
+        public CIL_Program(CIL_Code code, CIL_Data data, CIL_Types types)
+        {
+            Code = code;
+            Data = data;
+            Types = types;
+        }
+
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
+    }
+
+    public class CIL_OneType : CIL_Node
     {
         public List<string> Attributes;
         public List<Tuple<string, string>> Methods;
 
-        public OneType(List<string> attributes, List<Tuple<string, string>> methods)
+        public CIL_OneType(List<string> attributes, List<Tuple<string, string>> methods)
         {
             Attributes = attributes;
             Methods = methods;
         }
+
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
     }
-    
-    public class Types
+
+    public class CIL_Types : CIL_Node
     {
-        public Dictionary<string, OneType> _types { get; }
+        public Dictionary<string, CIL_OneType> _types { get; }
 
-        public Types()
+        public CIL_Types()
         {
-            _types = new Dictionary<string, OneType>();
+            _types = new Dictionary<string, CIL_OneType>();
         }
+
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
     }
 
-    public class Data
+    public class CIL_Data : CIL_Node
     {
         public List<Tuple<string, string>> _stringVars { get; }
-        public List<Tuple<string, int>> _integerVars { get; }
 
-        public Data()
+        public CIL_Data()
         {
             _stringVars = new List<Tuple<string, string>>();
-            _integerVars = new List<Tuple<string, int>>();
-        }
-
-        public void AddIntegerVar(string name, int value)
-        {
-            _integerVars.Add(new Tuple<string, int>(name, value));
         }
 
         public void AddStringVar(string name, string value)
         {
             _stringVars.Add(new Tuple<string, string>(name, value));
         }
+
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
     }
 
-    public class Instruction
-    {}
-    
-    public class Function
+    public abstract class CIL_Instruction : CIL_Node
     {
-        public List<int> Args; // preguntar sobre el tipo de los argumentos,aqui asumo que solo son enteros
-        public List<string> Locals;
-        public List<Instruction> Instructions;
-
-        public Function(List<int> inValues)
-        {
-            Args = inValues;
-            Locals = new List<string>();
-            Instructions = new List<Instruction>();
-        }
-
-        public void AddLocal(string name)
-        {
-            Locals.Add(name);
-        }
-
-        public void AddInstruction(Instruction ins)
-        {
-            Instructions.Add(ins);
-        }
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
     }
 
-    public class Code
+    public class CIL_Function : CIL_Node
     {
-        public List<Function> Funcs;
+        private string _name;
+        public string Name => _name;
+        public List<string> Args;   // estos son los nombres de las variables y el lugar que ocupan en
+        public List<string> Locals; // memoria en MIPS
+        public List<CIL_Instruction> Instructions;
 
-        public Code()
+        public CIL_Function(string name, List<string> args, List<string> locals, List<CIL_Instruction> inst)
         {
-            Funcs = new List<Function>();
+            _name = name;
+            Args = args;
+            Locals = locals;
+            Instructions = inst;
         }
 
-        public void AddFunc(Function func)
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
+    }
+
+    public class CIL_Code : CIL_Node
+    {
+        public List<CIL_Function> Funcs;
+
+        public CIL_Code()
+        {
+            Funcs = new List<CIL_Function>();
+        }
+
+        public void AddFunc(CIL_Function func)
         {
             Funcs.Add(func);
         }
+
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
     }
 
-    public class Assig : Instruction // OJO: las asignaciones solo van a ser con constantes
+    public class CIL_Assig : CIL_Instruction
     {
-        private bool _constant = false;
-        public bool Constant => _constant;
+        public CIL_MyVar Dest;
+        public string RigthMem;
 
-        public readonly string IzqMem;
-        public readonly int DerMemCons;
-        public string DerMemVar;
-
-        public Assig(string izqMem, int derMem)
+        public CIL_Assig(CIL_MyVar dest, string rigthMem)
         {
-            _constant = true;
-            IzqMem = izqMem;
-            DerMemCons = derMem;
+            Dest = dest;
+            RigthMem = rigthMem;
         }
 
-        public Assig(string izqMem, string derMem)
-        {
-            IzqMem = izqMem;
-            DerMemVar = derMem;
-        }
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
     }
 
-    public class Atom{}
-
-    public class MyVar : Atom
+    public class CIL_MyVar : CIL_Instruction
     {
         public string Name { get; }
+        public int Id { get; }
 
-        public MyVar(string name)
+        public CIL_MyVar(string name, int id)
         {
             Name = name;
+            Id = id;
         }
+
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
     }
 
-    public class MyCons : Atom
+    public class CIL_MyCons : CIL_Instruction
     {
         public int Value { get; }
 
-        public MyCons(int value)
+        public CIL_MyCons(int value)
         {
             Value = value;
         }
+
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
     }
 
-//    public class OperationBin : Instruction // OJO: las operaciones solo van a ser con variables
-//    {
-//        // VCALL
-//        public string Dest;
-//        public string RigthOp;
-//        public string LeftOp;
-//        public readonly string Op;
-//
-//        public OperationBin(string dest, string rigthOp, string leftOp, string op)
-//        {
-//            Dest = dest;
-//            RigthOp = rigthOp;
-//            LeftOp = leftOp;
-//            Op = op;
-//        }
-//    }
+    public class CIL_Concat : CIL_Instruction
+    {
+        public CIL_MyVar Dest;
+        public CIL_MyVar Var1;
+        public CIL_MyVar Var2;
 
-    public class ArithExpr : Instruction
+        public CIL_Concat(CIL_MyVar dest, CIL_MyVar var1, CIL_MyVar var2)
+        {
+            Dest = dest;
+            Var1 = var1;
+            Var2 = var2;
+        }
+
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
+    }
+
+    public class CIL_Substring : CIL_Instruction
     {
         public string Dest;
-        public Atom RigthOp;
-        public Atom LeftOp;
+        public CIL_MyVar Var1;
+        public CIL_MyVar Var2;
+
+        public CIL_Substring(string dest, CIL_MyVar var1, CIL_MyVar var2)
+        {
+            Dest = dest;
+            Var1 = var1;
+            Var2 = var2;
+        }
+
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
+    }
+
+    public class CIL_ArithExpr : CIL_Instruction
+    {
+        public CIL_MyVar Dest;
+        public CIL_Instruction RigthOp;
+        public CIL_Instruction LeftOp;
         public string Op;
-        
-        public ArithExpr(string dest, Atom rigthOp, Atom leftOp, string op)
+
+        public CIL_ArithExpr(CIL_MyVar dest, CIL_Instruction rigthOp, CIL_Instruction leftOp, string op)
         {
             Dest = dest;
             RigthOp = rigthOp;
             LeftOp = leftOp;
             Op = op;
         }
+
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
     }
 
-    public class GetAttr : Instruction
+    public class CIL_GetAttr : CIL_Instruction
     {
         public string Dest;
         public string Instance;
-        public OneType MyType;
+        public CIL_OneType MyType;
 
-        public GetAttr(string dest, string instance, OneType myType)
+        public CIL_GetAttr(string dest, string instance, CIL_OneType myType)
         {
             Dest = dest;
             Instance = instance;
             MyType = myType;
         }
+
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
     }
 
-    public class SetAttr : Instruction
+    public class CIL_SetAttr : CIL_Instruction
     {
         public string Instance;
-        public OneType MyType;
-        public Atom Value;
+        public CIL_OneType MyType;
+        public string Value;
 
-        public SetAttr(string instance, OneType myType, Atom value)
+        public CIL_SetAttr(string instance, CIL_OneType myType, string value)
         {
             Instance = instance;
             MyType = myType;
             Value = value;
         }
+
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
     }
 
-    public class VCall : Instruction
+    public class CIL_VCall : CIL_Instruction
     {
         public string Dest;
-        public OneType MyType;
+        public CIL_OneType MyType;
         public string FuncName;
 
-        public VCall(string dest, OneType myType, string funcName)
+        public CIL_VCall(string dest, CIL_OneType myType, string funcName)
         {
             Dest = dest;
             MyType = myType;
             FuncName = funcName;
         }
+
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
     }
 
-//    public class OperationUni : Instruction
-//    {
-//        // CALL, LOAD, LENGTH, CONCAT, SUBSTRING, STR y ConditionalJump(IF x GOTO l)
-//        public string RigthMem;
-//        public string LeftMem;
-//        public readonly string Op;
-//
-//        public OperationUni(string rigthMem, string leftMem, string op)
-//        {
-//            RigthMem = rigthMem;
-//            LeftMem = leftMem;
-//            Op = op;
-//        }
-//    }
-
-    public class Allocate : Instruction
+    public class CIL_Allocate : CIL_Instruction
     {
         public string Dest;
-        public OneType MyType;
+        public CIL_OneType MyType;
 
-        public Allocate(string dest, OneType myType)
+        public CIL_Allocate(string dest, CIL_OneType myType)
         {
             Dest = dest;
             MyType = myType;
         }
+
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
     }
-    
-    public class Call : Instruction
-    {}
 
-    public class SimpleOperation : Instruction
+    public class CIL_Call : CIL_Instruction
     {
-        // aqui entran LABEL, GOTO, RETURN, READ y PRINT
-        public string Obj;
-        public string Op;
+        public string Dest;
+        public CIL_Function MyFunc;
 
-        public SimpleOperation(string obj, string op)
+        public CIL_Call(string dest, CIL_Function myFunc)
         {
-            Obj = obj;
-            Op = op;
+            Dest = dest;
+            MyFunc = myFunc;
         }
+
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
+    }
+
+    public class CIL_Load : CIL_Instruction
+    {
+        public string Dest;
+        public CIL_MyVar Msg;
+
+        public CIL_Load(string dest, CIL_MyVar msg)
+        {
+            Dest = dest;
+            Msg = msg;
+        }
+
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
+    }
+
+    public class CIL_Length : CIL_Instruction
+    {
+        public string Dest;
+        public CIL_MyVar Msg;
+
+        public CIL_Length(string dest, CIL_MyVar msg)
+        {
+            Dest = dest;
+            Msg = msg;
+        }
+
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
+    }
+
+    public class CIL_Str : CIL_Instruction
+    {
+        public string Dest;
+        public string MyVar;
+
+        public CIL_Str(string dest, string myVar)
+        {
+            Dest = dest;
+            MyVar = myVar;
+        }
+
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
+    }
+
+    public class CIL_Label : CIL_Instruction
+    {
+        public string _label;
+
+        public CIL_Label(string label)
+        {
+            _label = label;
+        }
+
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
+    }
+
+    public class CIL_Goto : CIL_Instruction
+    {
+        public string _label;
+
+        public CIL_Goto(string label)
+        {
+            _label = label;
+        }
+
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
+    }
+
+    public class CIL_Return : CIL_Instruction
+    {
+        public string id;
+        public string value;
+
+        public CIL_Return(string id, string value)
+        {
+            this.id = id;
+            this.value = value;
+        }
+
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
+    }
+
+    public class CIL_Read : CIL_Instruction
+    {
+        public CIL_MyVar _var;
+
+        public CIL_Read(CIL_MyVar myVar)
+        {
+            _var = myVar;
+        }
+
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
+    }
+
+    public class CIL_Print : CIL_Instruction
+    {
+        public CIL_MyVar _var;
+
+        public CIL_Print(CIL_MyVar myVar)
+        {
+            _var = myVar;
+        }
+
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
+    }
+
+    public class CIL_ConditionalJump : CIL_Instruction
+    {
+        public CIL_Instruction ConditionVar;
+        public string Label;
+
+        public CIL_ConditionalJump(CIL_Instruction conditionVar, string label)
+        {
+            ConditionVar = conditionVar;
+            Label = label;
+        }
+
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
+    }
+
+    public class CIL_Arg : CIL_Instruction
+    {
+        public string name;
+
+        public CIL_Arg(string n)
+        {
+            name = n;
+        }
+
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
+    }
+
+    public class CIL_is_void : CIL_Instruction
+    {
+        public string arg;
+        public string ret;
+        public CIL_is_void(string ret, string arg)
+        {
+            this.ret = ret;
+            this.arg = arg;
+        }
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
+
+
     }
 }
