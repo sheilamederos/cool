@@ -244,18 +244,18 @@ namespace AST
 
     public class If_Else : Expr
     {
-        public Expr exp1, exp2, exp3;
+        public Expr cond, then, elsse;
         public If_Else(Expr e1, Expr e2, Expr e3) : base(new Node[] { e1, e2, e3 })
         {
-            exp1 = e1;
-            exp2 = e2;
-            exp3 = e3;
+            cond = e1;
+            then = e2;
+            elsse = e3;
         }
         public override T Visit<T>(IVisitorAST<T> visitor) => visitor.Visit(this);
 
         public override string ToString()
         {
-            return "If: " + exp1.ToString() + " Then: " + exp2.ToString() + " Else: " + exp3.ToString();
+            return "If: " + cond.ToString() + " Then: " + then.ToString() + " Else: " + elsse.ToString();
         }
     }
 

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using AST_CIL;
+using CIL;
+using AST;
 
-namespace AST
+namespace Logic
 {
     public class Take_str
     {
@@ -141,6 +142,7 @@ namespace AST
             throw new NotImplementedException();
         }
 
+
         public string Visit(Program node)
         {
             Dictionary<string, IType> Types_Cool = IType.GetAllTypes(node);
@@ -216,7 +218,9 @@ namespace AST
                 string v = take_data.take(method.current_scope.id);
                 Data.Add(node.s, v);
             }
-            return Data[node.s];
+            var exp = method.Add_local("exp", true);
+            method.Add_Instruction(new CIL_Load(exp, Data[node.s]));
+            return exp;
         }
 
         public string Visit(Call_Method node)
@@ -236,14 +240,24 @@ namespace AST
 
         public string Visit(If_Else node)
         {
-            throw new NotImplementedException();
-            //var cond = Visit(node.exp1);
-            //var then = Visit(node.exp2);
-            //var elsse = Visit(node.exp3);
-            //var ret = method.Add_local("ret_if", true);
-            //var begin_if = method.Take_var("begin_if");
-            //var end_if = method.Take_var("end_if");
-            //method.Add_Instruction(new CIL_())
+            var cond = Visit(node.cond);
+            var then = Visit(node.then);
+
+            var ret = method.Add_local("ret_if", true);
+            var begin_if = method.Take_var("begin_if");
+            var end_if = method.Take_var("end_if");
+            method.Add_Instruction(new CIL_If(cond, begin_if));
+
+            if (node.elsse != null)
+            {
+                var elsse = Visit(node.elsse);
+                method.Add_Instruction(new CIL_Assig(ret, elsse));
+                method.Add_Instruction(new CIL_Goto(end_if));
+            }
+
+            method.Add_Instruction(new CIL_Assig(ret, then));
+            method.Add_Instruction(new CIL_Label(end_if));
+            return ret;
         }
 
         public string Visit(While_loop node)
@@ -276,22 +290,41 @@ namespace AST
 
         public string Visit(UnaryExpr node)
         {
-            throw new NotImplementedException();
+            var exp = Visit(node.exp);
+            var ret = method.Add_local("expr", true);
+            method.Add_Instruction(new CIL_UnaryExpr(ret, node.op, exp));
+            return ret;
         }
 
         public string Visit(Assign node)
         {
             throw new NotImplementedException();
+            var exp = Visit(node.exp);
+            //NECESITAMOS QUE SHEILA DEJE DE COMER PINGA
         }
 
         public string Visit(Id node)
         {
             throw new NotImplementedException();
+            //if (method.current_scope.Get_var(node.name) == null && method.args.Contains(node.name))
+            //{
+            //    return node.name;
+            //}
+            //else if ()
         }
 
         public string Visit(Const node)
         {
-            throw new NotImplementedException();
+            int x;
+            if (int.TryParse(node.name, out x))
+            {
+                return node.name;
+            }
+            else if (node.name.ToUpper() == "TRUE")
+            {
+                return "1";
+            }
+            else return "0";
         }
 
         public string Visit(Lista<Node> node)

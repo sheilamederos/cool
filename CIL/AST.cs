@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace AST_CIL
+namespace CIL
 {
     public abstract class CIL_Node
     {
@@ -111,10 +111,10 @@ namespace AST_CIL
 
     public class CIL_Assig : CIL_Instruction
     {
-        public CIL_MyVar Dest;
+        public string Dest;
         public string RigthMem;
 
-        public CIL_Assig(CIL_MyVar dest, string rigthMem)
+        public CIL_Assig(string dest, string rigthMem)
         {
             Dest = dest;
             RigthMem = rigthMem;
@@ -176,6 +176,20 @@ namespace AST_CIL
             Dest = dest;
             Var1 = var1;
             Var2 = var2;
+        }
+
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
+    }
+
+    public class CIL_UnaryExpr : CIL_Instruction
+    {
+        public string dest, op;
+        public string expr;
+        public CIL_UnaryExpr(string dest, string op, string exp)
+        {
+            this.dest = dest;
+            this.op = op;
+            expr = exp;
         }
 
         public override void Accept(IVisitor visitor) => visitor.Accept(this);
@@ -278,9 +292,9 @@ namespace AST_CIL
     public class CIL_Load : CIL_Instruction
     {
         public string Dest;
-        public CIL_MyVar Msg;
+        public string Msg;
 
-        public CIL_Load(string dest, CIL_MyVar msg)
+        public CIL_Load(string dest, string msg)
         {
             Dest = dest;
             Msg = msg;
@@ -326,6 +340,18 @@ namespace AST_CIL
             _label = label;
         }
 
+        public override void Accept(IVisitor visitor) => visitor.Accept(this);
+    }
+
+    public class CIL_If : CIL_Instruction
+    {
+        public string cond;
+        public string label;
+        public CIL_If(string cond, string label)
+        {
+            this.cond = cond;
+            this.label = label;
+        }
         public override void Accept(IVisitor visitor) => visitor.Accept(this);
     }
 

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AST_CIL
+namespace CIL
 {
     public interface IVisitor
     {

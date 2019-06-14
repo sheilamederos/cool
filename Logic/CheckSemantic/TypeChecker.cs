@@ -252,9 +252,9 @@ namespace Logic.CheckSemantic
 
         public IType Visit(If_Else node)
         {
-            IType type_exp1 = this.Visit(node.exp1);
-            IType type_exp2 = this.Visit(node.exp2);
-            IType type_exp3 = this.Visit(node.exp3);
+            IType type_exp1 = this.Visit(node.cond);
+            IType type_exp2 = this.Visit(node.then);
+            IType type_exp3 = this.Visit(node.elsse);
 
             if (type_exp1 == null || type_exp2 == null || type_exp3 == null) return null;
 

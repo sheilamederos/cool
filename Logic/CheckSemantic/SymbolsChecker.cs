@@ -221,7 +221,7 @@ namespace Logic.CheckSemantic
 
         public bool Visit(If_Else node)
         {
-            return this.Visit(node.exp1) && this.Visit(node.exp2) && this.Visit(node.exp3);
+            return this.Visit(node.cond) && this.Visit(node.then) && this.Visit(node.elsse);
         }
 
         public bool Visit(While_loop node)

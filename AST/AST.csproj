@@ -45,16 +45,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AST.cs" />
-    <Compile Include="COOLtoCIL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Types\Types.cs" />
     <Compile Include="Visitor.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\AST_CIL\AST_CIL.csproj">
-      <Project>{7966df21-55cb-40ae-b76b-e0ff1e2c8321}</Project>
-      <Name>AST_CIL</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
