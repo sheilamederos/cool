@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using CIL;
 using AST;
-using Logic.CheckSemantic;
 
 namespace Logic
 {
@@ -113,12 +112,13 @@ namespace Logic
 
     public class GET_CIL_AST
     {
-        //public static CIL_Program(Program node)
-        //{
-        //    var comp = new CoolToCil();
-        //    comp.Visit(node);
-        //    return new CIL_Program()
-        //}
+        public static CIL_Program CIL(Program node)
+        {
+            var comp = new CoolToCil();
+            comp.Visit(node);
+            List<CIL_Function> code = new List<CIL_Function>(comp.Code.Select(x => x.Value));
+            return new CIL_Program(new CIL_Code(code), new CIL_Data(comp.Data), new CIL_Types(comp.Types));
+        }
     }
 
     public class CoolToCil : IVisitorAST<string>
@@ -126,8 +126,8 @@ namespace Logic
         Take_str take_data;
 
         public Dictionary<string, string> Data;
-        Dictionary<string, CIL_Function> Code;
-        Dictionary<string, CIL_OneType> Types;
+        public Dictionary<string, CIL_Function> Code;
+        public Dictionary<string, CIL_OneType> Types;
 
         Current_Method method;
         Dictionary<string, IType> Types_Cool;
@@ -170,7 +170,7 @@ namespace Logic
                     mtds.Add(new Tuple<string, string>(mtd.Name, mtd_name));
                 }
 
-                Types[key] = new CIL_OneType(attrs, mtds);
+                Types[key] = new CIL_OneType(key, attrs, mtds);
             }
 
             foreach (var item in node.list)
@@ -194,7 +194,7 @@ namespace Logic
         {
             method = new Current_Method();
             string solution = Visit(node.exp);
-            method.Add_Instruction(new CIL_Return("ret", solution));
+            method.Add_Instruction(new CIL_Return(solution));
             Code.Add(node.name.name, new CIL_Function(node.name.name, new List<string>(node.args.list_Node.Select(x => x.name.name)), new List<string>(method.locals.Values), method.body));
             return "";
         }
@@ -278,8 +278,24 @@ namespace Logic
 
         public string Visit(Let_In node)
         {
+            List<string> attrs = new List<string>();
+            foreach (var attr in node.attrs.list_Node)
+            {
+                if (attr.exp != null)
+                {
+                    attrs.Add(Visit(attr.exp)); 
+                }
+                else attrs.Add(null);
+            }
+
             method.Add_scope("let");
-            Visit(node.attrs);
+
+            for (int i = 0; i < attrs.Count; i++)
+            {
+                string name = method.Add_local(node.attrs.list_Node[i].name.name);
+                if (attrs[i] != null) method.Add_Instruction(new CIL_Assig(name, attrs[i]));
+            }
+            
             var exp = Visit(node.exp);
             var ret = method.Add_local("expr", true);
             method.Add_Instruction(new CIL_Assig(ret, exp));
@@ -295,7 +311,7 @@ namespace Logic
             var ret = method.Add_local("ret_if", true);
             var begin_if = method.Take_var("begin_if");
             var end_if = method.Take_var("end_if");
-            method.Add_Instruction(new CIL_If(cond, begin_if));
+            method.Add_Instruction(new CIL_ConditionalJump(cond, begin_if));
 
             if (node.elsse != null)
             {
@@ -319,7 +335,7 @@ namespace Logic
             var cond = Visit(node.exp1);
             var body = Visit(node.exp2);
             method.Add_Instruction(new CIL_Label(begin_while));
-            method.Add_Instruction(new CIL_If(cond, body_while));
+            method.Add_Instruction(new CIL_ConditionalJump (cond, body_while));
             method.Add_Instruction(new CIL_Goto(end_while));
             method.Add_Instruction(new CIL_Label(body_while));
             method.Add_Instruction(new CIL_Assig(ret, body));

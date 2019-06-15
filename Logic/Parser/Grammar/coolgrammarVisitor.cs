@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from c:\users\ale\documents\visual studio 2017\projects\compiler\logic\parser\grammar\coolgrammar.g4 by ANTLR 4.7.1
+// Generated from C:\Users\Ale\Desktop\Proyecto\Compiler\Logic\Parser\Grammar\coolgrammar.g4 by ANTLR 4.7.1
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -132,19 +132,19 @@ public interface IcoolgrammarVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitWhile([NotNull] coolgrammarParser.WhileContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>call_method</c>
-	/// labeled alternative in <see cref="coolgrammarParser.expr"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitCall_method([NotNull] coolgrammarParser.Call_methodContext context);
-	/// <summary>
 	/// Visit a parse tree produced by the <c>id</c>
 	/// labeled alternative in <see cref="coolgrammarParser.expr"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitId([NotNull] coolgrammarParser.IdContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>call_method</c>
+	/// labeled alternative in <see cref="coolgrammarParser.expr"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitCall_method([NotNull] coolgrammarParser.Call_methodContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>new_type</c>
 	/// labeled alternative in <see cref="coolgrammarParser.expr"/>.

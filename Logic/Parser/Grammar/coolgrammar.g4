@@ -27,12 +27,12 @@ expr    : expr ('@' TYPE)? '.' ID '(' args_call ')'								# dispatch
         | expr op = ('<' | '<=' | '=') expr				                        # comp
         | op = ( NOT | '~' ) expr						                        # unary_exp
         | '(' expr ')'									                        # parentesis
-		| ID											                        # id
 		| INTEGER										                        # int
 		| cons = (TRUE | FALSE)						                            # bool
 		| STR																	# string
 		| ID '<-' expr								                            # assign
 		| LET attr (',' attr )* IN expr										    # let
+		| ID											                        # id
 		;
 
 

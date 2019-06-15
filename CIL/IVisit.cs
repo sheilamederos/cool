@@ -21,7 +21,7 @@ namespace CIL
         void Accept(CIL_Code code);
 
         void Accept(CIL_Assig assig);
-
+      
         void Accept(CIL_Concat concat);
 
         void Accept(CIL_Substring substring);
