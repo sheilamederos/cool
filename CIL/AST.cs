@@ -127,14 +127,14 @@ namespace CIL
     public class CIL_Concat : CIL_Instruction
     {
         public string Dest;
-        public string Var1;
-        public string Var2;
+        public string Msg1;
+        public string Msg2;
 
-        public CIL_Concat(string dest, string var1, string var2)
+        public CIL_Concat(string dest, string msg1, string msg2)
         {
             Dest = dest;
-            Var1 = var1;
-            Var2 = var2;
+            Msg1 = msg1;
+            Msg2 = msg2;
         }
 
         public override void Accept(IVisitor visitor) => visitor.Accept(this);
@@ -143,14 +143,16 @@ namespace CIL
     public class CIL_Substring : CIL_Instruction
     {
         public string Dest;
-        public string Var1;
-        public string Var2;
+        public string Msg;
+        public string Index;
+        public string Length;
 
-        public CIL_Substring(string dest, string var1, string var2)
+        public CIL_Substring(string dest, string msg, string index, string length)
         {
             Dest = dest;
-            Var1 = var1;
-            Var2 = var2;
+            Msg = msg;
+            Index = index;
+            Length = length;
         }
 
         public override void Accept(IVisitor visitor) => visitor.Accept(this);

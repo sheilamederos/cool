@@ -58,6 +58,10 @@
       <Project>{9566e3bd-eba9-4c7c-be88-46695c569954}</Project>
       <Name>AST</Name>
     </ProjectReference>
+    <ProjectReference Include="..\CIL\CIL.csproj">
+      <Project>{833686d3-161c-43a7-a53d-96ff5fcf10bd}</Project>
+      <Name>CIL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Logic\Logic.csproj">
       <Project>{08bd8738-900f-4a71-a4c3-af9ad89ee325}</Project>
       <Name>Logic</Name>

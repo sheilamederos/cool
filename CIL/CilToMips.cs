@@ -45,7 +45,9 @@ namespace CIL
 
         public void Accept(CIL_Data data)
         {
-            Data += "\t buffer: .space 65536 \n";
+            Data += "\t buffer:             .space    65536 \n" +
+                    "\t zero:               .byte     0 \n" +
+                    "\t strsubstrexception: .asciiz \"Substring index exception\" \n";
             
             foreach (var strVar in data._stringVars)
                 Data += strVar.Item1 + ":\t .asciiz \t" + "\"" + strVar.Item2 + "\"\n";
@@ -121,12 +123,37 @@ namespace CIL
 
         public void Accept(CIL_Concat concat)
         {
-            throw new System.NotImplementedException();
+            // -12($sp) = string a, -16($sp) = string b
+            Text += "\t la $a0, " + concat.Msg1 + "\n" +
+                    "\t sw $a0, -12($sp) \n" +
+                    "\t la $a0, " + concat.Msg2 + "\n" +
+                    "\t sw $a0, -16($sp) \n" +
+                    "\t jal _stringconcat \n" +
+                    "\t sw $v0, " + CurrentScope.VarInStack[concat.Dest] + "($sp) \n";
         }
 
         public void Accept(CIL_Substring substring)
         {
-            throw new System.NotImplementedException();
+            // -12($sp) = msg, -16($sp) = int index, -20($sp) = int length
+            Text += "\t la $a0, " + substring.Msg + "\n" +
+                    "\t sw $a0, -12($sp) \n";
+
+            if (int.TryParse(substring.Index, out int index))
+                Text += "\t li $a0, " + index + "\n";
+            else
+                Text += "\t lw $a0, " + CurrentScope.VarInStack[substring.Index] + "($fp) \n";
+            
+            Text += "\t sw $a0, -16($sp) \n";
+
+            if (int.TryParse(substring.Length, out int length))
+                Text += "\t li $a0, " + length + "\n";
+            else
+                Text += "\t lw $a0, " + CurrentScope.VarInStack[substring.Length] + "($fp) \n";
+
+            Text += "\t sw $a0, -20($sp) \n";
+
+            Text += "\t jal _stringsubstr \n" +
+                    "\t sw $v0, " + CurrentScope.VarInStack[substring.Dest] + "($sp) \n";
         }
 
         public void Accept(CIL_ArithExpr arithExpr)
@@ -226,7 +253,11 @@ namespace CIL
 
         public void Accept(CIL_Length length)
         {
-            throw new System.NotImplementedException();
+            // -12($sp) = string a
+            Text += "\t la $a0, " + length.Msg + "\n" +
+                    "\t sw $a0, -12($sp) \n" +
+                    "\t jal _stringlength \n" +
+                    "\t sw $v0, " + CurrentScope.VarInStack[length.Dest] + "($sp) \n";
         }
 
         public void Accept(CIL_Str str)
@@ -259,23 +290,10 @@ namespace CIL
         // TODO: me quede por aqui, hacer los diferentes reads y prints
         public void Accept(CIL_Read read)
         {
-            // modificar este buffer
-            string buffer = "asdasdasd";
-            Data += "\t " + buffer + ": .space 65536 \n";
-            
-            // Creo q va a ser un problema leer siempre con el mismo buffer
-            Text += "\t la $a0, " + buffer + " \n" +
-                    "\t li $a1, 65536 \n" +
-                    "\t li $v0, 8 \n" +
-                    "\t syscall \n" +
-                    "\t sw $a0, " + 4 * (read._var.Id + 1) + "($sp)";
         }
 
         public void Accept(CIL_Print print)
         {
-            Text += "\t lw $a0, " + 4 * (print._var.Id + 1) + "($sp) \n" +
-                    "\t li $v0, 4 \n" +
-                    "\t syscall \n";
         }
 
         public void Accept(CIL_ConditionalJump cj)
