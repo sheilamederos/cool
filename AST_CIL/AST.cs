@@ -284,10 +284,10 @@ namespace AST_CIL
 
     public class CIL_Call : CIL_Instruction
     {
-        public string Dest;
+        public CIL_MyVar Dest;
         public CIL_Function MyFunc;
 
-        public CIL_Call(string dest, CIL_Function myFunc)
+        public CIL_Call(CIL_MyVar dest, CIL_Function myFunc)
         {
             Dest = dest;
             MyFunc = myFunc;
@@ -298,10 +298,10 @@ namespace AST_CIL
 
     public class CIL_Load : CIL_Instruction
     {
-        public string Dest;
+        public CIL_MyVar Dest;
         public CIL_MyVar Msg;
 
-        public CIL_Load(string dest, CIL_MyVar msg)
+        public CIL_Load(CIL_MyVar dest, CIL_MyVar msg)
         {
             Dest = dest;
             Msg = msg;
@@ -400,10 +400,10 @@ namespace AST_CIL
 
     public class CIL_ConditionalJump : CIL_Instruction
     {
-        public CIL_Atom ConditionVar;
+        public CIL_MyVar ConditionVar;
         public string Label;
 
-        public CIL_ConditionalJump(CIL_Atom conditionVar, string label)
+        public CIL_ConditionalJump(CIL_MyVar conditionVar, string label)
         {
             ConditionVar = conditionVar;
             Label = label;
@@ -414,9 +414,16 @@ namespace AST_CIL
 
     public class CIL_Arg : CIL_Instruction
     {
-        public CIL_Atom Arg;
+        /// <summary>
+        /// Importante: el constructor de esta clase solo recive variables.
+        /// Si se va a pasar una constante a un metodo, primero crear una
+        /// nueva variable, luego hacer una asignacion y despues pasar esa
+        /// variable al llamado de la funcion
+        /// </summary>
+        
+        public CIL_MyVar Arg;
 
-        public CIL_Arg(CIL_Atom arg)
+        public CIL_Arg(CIL_MyVar arg)
         {
             Arg = arg;
         }

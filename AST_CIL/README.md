@@ -9,4 +9,8 @@ Mes estoy planteando si en realidad es necesario un tipo Atom del cual derivan V
 
 Las variables las voy a colocar en la pila en la posicion `4 * (var.ID + 1)` de el registro `sp`
 
-## TODO: como toletes concateno 2 strings
+## TODO: como toletes concateno 2 strings, el substring y el str
+
+Bueno para concatenar y para los substring hacerlo con cilos recorriendo las cadenas
+
+Es necesario usar operaciones unsigned en MIPS para el compilador de cool????
