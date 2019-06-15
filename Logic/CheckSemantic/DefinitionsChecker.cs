@@ -67,16 +67,19 @@ namespace Logic.CheckSemantic
         public bool Visit(Class_Def node)
         {
             bool solve = true;
+
             if (Types_built_in.Contains(node.inherit_type.s))
             {
                 Logger += "En la expresion " + node.ToString() + "-> error de definicion (clase '" + node.type.s + "' no puede heredar de tipos built-in) \n";
                 solve = false;
             }
+
             if (!Types.Contains(node.inherit_type.s))
             {
                 Logger += "En la expresion " + node.ToString() + "-> error de definicion (el tipo padre de la clase '" + node.type.s + "' no esta definido ) \n";
                 solve = false;
             }
+
             foreach (var item in node.attr.list_Node)
                 solve &= this.Visit(item);
 

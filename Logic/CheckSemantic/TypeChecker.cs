@@ -62,6 +62,7 @@ namespace Logic.CheckSemantic
             List<string> comp_op = new List<string> { "<", "<=" };
             List<string> basic_types = new List<string> { "Int", "Bool", "String", "Object" };
 
+            // Es una operacion aritmetica o de comparacion
             if (arith_op.Contains(node.op) || comp_op.Contains(node.op))
             {
                 if (type_left != null && type_left.Name != "Int")
@@ -77,20 +78,21 @@ namespace Logic.CheckSemantic
                 return Context.GetType("Bool");
             }
 
-            
-
-            if (arith_op.Contains(node.op)) return type_rigth;
-
-            if (comp_op.Contains(node.op)) return Context.GetType("Bool");
+            // Es una operacion (=)
 
             if (type_left == null || type_rigth == null) return Context.GetType("Bool");
 
-            if ((basic_types.Contains(type_left.Name) || basic_types.Contains(type_rigth.Name)) && type_left.Name != type_rigth.Name)
+            bool is_built_in = basic_types.Contains(type_left.Name) || basic_types.Contains(type_rigth.Name);
+
+            if (is_built_in && type_left.Name != type_rigth.Name)
             {
                 Logger += "En la expresion " + node.ToString() + "-> error de tipos (Las expresiones no tienen el mismo tipo built-in) \n";
             }
 
-            if(!(Context.GetType(type_left.Name).Conform(Context.GetType(type_rigth.Name))) || !Context.GetType(type_rigth.Name).Conform(Context.GetType(type_left.Name)))
+            bool conform1 = type_left.Conform(type_rigth);
+            bool conform2 = type_rigth.Conform(type_left);
+
+            if (!is_built_in && !conform1 && !conform2)
             {
                 Logger += "En la expresion " + node.ToString() + "-> error de tipos (Las expresiones no tienen tipos conformables)\n";
             }
@@ -154,6 +156,10 @@ namespace Logic.CheckSemantic
         {
             Context.ActualType = Context.GetType(node.type.s);
             Context.DefineSymbol("self", Context.ActualType);
+
+            foreach (var attr in Context.GetType(node.inherit_type.s).AllAttributes())
+                Context.DefineSymbol(attr.Name, attr.Type);
+
             foreach (var cldr in node.attr.list_Node)
             {
                 IType t = this.Visit(cldr);
@@ -168,6 +174,8 @@ namespace Logic.CheckSemantic
             {
                 Context.UndefineSymbol();
             }
+
+            Context.UndefineSymbol();
             return null;
         }
 
@@ -238,8 +246,8 @@ namespace Logic.CheckSemantic
         {
             foreach (Attr_Def cld in node.attrs.list_Node)
             {
-                Context.DefineSymbol(cld.name.name, Context.GetType(cld.type.s));
                 this.Visit(cld);
+                Context.DefineSymbol(cld.name.name, Context.GetType(cld.type.s));
             }
 
             IType type = this.Visit(node.exp);
@@ -272,7 +280,7 @@ namespace Logic.CheckSemantic
             
             this.Visit(node.exp2);
 
-            if(type_exp1.Name != "Bool")
+            if(type_exp1 == null || type_exp1.Name != "Bool")
                 Logger += "En la expresion " + node.ToString() + "-> error de tipos (La condicion no tiene tipo bool) \n";
             return Context.GetType("Object");
         }
@@ -305,22 +313,33 @@ namespace Logic.CheckSemantic
         public IType Visit(Dispatch node)
         {
             IType type_exp = this.Visit(node.exp);
-            IType copy_actual_type = Context.ActualType;
 
-            if (node.s == "sin castear ")
-                Context.ActualType = type_exp;
+            IType type = new IType("", null);
+            if (node.s != "sin castear ")
+                type = Context.GetType(node.s);
             else if (type_exp != null && Context.GetType(node.s) != null && !type_exp.Conform(Context.GetType(node.s)))
             {
                 Logger += "En la expresion " + node.ToString() + "-> error de tipos (El tipo de la expresion no se conforma al del casteo) \n";
-                Context.ActualType = Context.GetType(node.s);
                 return null;
             }
-            else Context.ActualType = Context.GetType(node.s);
+            else
+            {
+                type = type_exp;
+            }
 
-            IType ret = this.Visit(node.call);
-            Context.ActualType = copy_actual_type;
+            Method m = type.GetMethod(node.call.name.name);
+            for (int i = 0; i < node.call.args.list_Node.Count; i++)
+            {
+                var exp = node.call.args.list_Node[i];
+                IType type_exp1 = this.Visit(exp);
 
-            return ret;
+                if (type_exp1 != null && m.Arguments[i].Type != null && !type_exp1.Conform(m.Arguments[i].Type))
+                {
+                    Logger += "En la expresion " + node.ToString() + "-> error de tipos (El tipo de la expresion " + (i + 1).ToString() + " no se conforma al del argumento)\n";
+                    return null;
+                }
+            }
+            return Context.GetType(m.ReturnType.Name);
         }
 
         public IType Visit(Str node)

@@ -193,7 +193,7 @@ namespace AST
             this.exp = exp;
             this.type = type;
             this.call = call;
-            s = (this.type != null) ? this.type.s + ' ' : "sin castear "; 
+            s = (this.type != null) ? this.type.s : "sin castear "; 
         }
 
         public override T Visit<T>(IVisitorAST<T> visitor) => visitor.Visit(this);
