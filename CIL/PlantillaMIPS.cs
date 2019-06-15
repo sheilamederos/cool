@@ -1,4 +1,4 @@
-﻿namespace AST_CIL
+﻿namespace CIL
 {
     public class PlantillaMIPS
     {

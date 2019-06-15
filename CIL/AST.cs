@@ -401,25 +401,13 @@ namespace CIL
 
     public class CIL_ConditionalJump : CIL_Instruction
     {
-        public CIL_Instruction ConditionVar;
+        public string ConditionVar;
         public string Label;
 
-        public CIL_ConditionalJump(CIL_Instruction conditionVar, string label)
+        public CIL_ConditionalJump(string conditionVar, string label)
         {
             ConditionVar = conditionVar;
             Label = label;
-        }
-
-        public override void Accept(IVisitor visitor) => visitor.Accept(this);
-    }
-
-    public class CIL_Arg : CIL_Instruction
-    {
-        public string name;
-
-        public CIL_Arg(string n)
-        {
-            name = n;
         }
 
         public override void Accept(IVisitor visitor) => visitor.Accept(this);

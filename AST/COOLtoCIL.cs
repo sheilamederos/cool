@@ -47,7 +47,17 @@
             throw new System.NotImplementedException();
         }
 
+        public bool Visit(Str node)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public bool Visit(Call_Method node)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public bool Visit(Dispatch node)
         {
             throw new System.NotImplementedException();
         }

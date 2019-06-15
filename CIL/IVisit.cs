@@ -21,10 +21,6 @@ namespace CIL
         void Accept(CIL_Code code);
 
         void Accept(CIL_Assig assig);
-        
-        void Accept(CIL_MyCons myCons);
-
-        void Accept(CIL_MyVar myVar);
 
         void Accept(CIL_Concat concat);
 
@@ -59,7 +55,5 @@ namespace CIL
         void Accept(CIL_Print print);
 
         void Accept(CIL_ConditionalJump cj);
-
-        void Accept(CIL_Arg arg);
     }
 }

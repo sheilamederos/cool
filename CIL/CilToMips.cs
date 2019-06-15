@@ -1,21 +1,25 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Web;
 
-namespace AST_CIL
+namespace CIL
 {
+    public class Scope
+    {
+        public Scope father;
+        public Dictionary<string, int> VarInStack;
+
+        public Scope()
+        {
+            VarInStack = new Dictionary<string, int>();
+        }
+    }
+    
     public class CilToMips : IVisitor
     {
         public string Data;
         public string Text;
-
-        private static int _buffer = 0;
-
-//        private string GetBuffer()
-//        {
-//            var result = "buffer" + _buffer;
-//            _buffer++;
-//            return result;
-//        }
+        public Scope CurrentScope;
         
         public void Accept(CIL_Program prog)
         {            
@@ -54,10 +58,27 @@ namespace AST_CIL
 
         public void Accept(CIL_Function function)
         {
+            var scope = new Scope {father = CurrentScope};
+            CurrentScope = scope;
+            
             // Las funciones van a recivir los parametros a partir de la
             // tercera posicion del stack (-12($sp)), en las dos primeras
             // van ra (-4($sp)) y fp (-8($sp))
             // Despues de los Args van los Locals
+
+            int i = -12;
+            foreach (var arg in function.Args)
+            {
+                scope.VarInStack[arg] = i;
+                i -= 4;
+            }
+
+            foreach (var local in function.Locals)
+            {
+                scope.VarInStack[local] = i;
+                i -= 4;
+            }
+            
             int n = 4 * (function.Args.Count + function.Locals.Count + 2); 
 
             Text += function.Name + ":\n";
@@ -74,6 +95,8 @@ namespace AST_CIL
                     "\t lw $fp, -8($fp) \n" +
                     "\t addu $sp, $sp, " + n + "\n" +
                     "\t j $ra \n"; // aqui por el momento voy a poner j pero puede ser jr
+
+            CurrentScope = CurrentScope.father;
         }
 
         public void Accept(CIL_Code code)
@@ -84,34 +107,16 @@ namespace AST_CIL
 
         public void Accept(CIL_Assig assig)
         {
-            // TODO: Revisar esto con Ale
-            int destPos = 4 * (assig.Dest.Id + 1);
-
-            if (assig.RigthMem is CIL_MyVar rigthMem)
+            if (int.TryParse(assig.RigthMem, out int n))
             {
-                int rigthPos = 4 * (rigthMem.Id + 1);
-                
-                Text += "\t sw " + rigthPos + "($sp), " + destPos + "($sp) \n";
+                Text += "\t li $a0, " + n + "\n" +
+                        "\t sw $a0, " + CurrentScope.VarInStack[assig.Dest] + "($fp) \n";
             }
             else
             {
-                Text += "\t sw " + ((CIL_MyCons) assig.RigthMem).Value + ", " + destPos + "($sp) \n";
+                Text += "\t lw $a0, " + CurrentScope.VarInStack[assig.RigthMem] + "($fp) \n" +
+                        "\t sw $a0, " + CurrentScope.VarInStack[assig.Dest] + "($fp) \n";
             }
-        }
-
-        public void Accept(CIL_Atom atom)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void Accept(CIL_MyCons myCons)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void Accept(CIL_MyVar myVar)
-        {
-            throw new System.NotImplementedException();
         }
 
         public void Accept(CIL_Concat concat)
@@ -126,32 +131,23 @@ namespace AST_CIL
 
         public void Accept(CIL_ArithExpr arithExpr)
         {
-            // TODO: La misma
-            int desPos = 4 * (arithExpr.Dest.Id + 1);
-
             // Calculando la direccion de memoria o el entero
             // que representa al miembro izquierdo de la operacion
             string leftMem = "";
             
-            if (arithExpr.LeftOp is CIL_MyVar myVar1)
-            {
-                leftMem = 4 * (myVar1.Id + 1) + "($sp)";
-                leftMem = "\t lw $t1, " + leftMem + "\n";
-            }
+            if (int.TryParse(arithExpr.LeftOp, out int n1))
+                leftMem = "\t li $t1, " + n1 + "\n";
             else
-                leftMem = "\t li $t1, " + ((CIL_MyCons) arithExpr.LeftOp).Value + "\n";
+                leftMem = "\t lw $t1, " + CurrentScope.VarInStack[arithExpr.LeftOp] + "($fp) \n";
 
             // Calculando la direccion de memoria o el entero
             // que representa al miembro derecho de la operacion
             string rigthMem = "";
 
-            if (arithExpr.RigthOp is CIL_MyVar myVar2)
-            {
-                rigthMem = 4 * (myVar2.Id + 1) + "($sp)";
-                rigthMem = "\t lw $t2, " + rigthMem + "\n";
-            }
+            if (int.TryParse(arithExpr.RigthOp, out int n2))
+                rigthMem = "\t li $t2, " + n2 + "\n";
             else
-                rigthMem = "\t li $t2, " + ((CIL_MyCons) arithExpr.RigthOp).Value + "\n";
+                rigthMem = "\t lw $t2, " + CurrentScope.VarInStack[arithExpr.RigthOp] + "($fp) \n";
 
             string operation = "";
             switch (arithExpr.Op)
@@ -175,7 +171,7 @@ namespace AST_CIL
             Text += leftMem +
                     rigthMem +
                     operation +
-                    "\t sw $t0, " + desPos + "($sp) \n";
+                    "\t sw $t0, " + CurrentScope.VarInStack[arithExpr.Dest] + "($fp) \n";
         }
 
         public void Accept(CIL_GetAttr getAttr)
@@ -200,18 +196,32 @@ namespace AST_CIL
 
         public void Accept(CIL_Call call)
         {
-            // Ponerle al call la lista de argumentos
-            Text += "\t jal " + call.MyFunc.Name + "\n" +
-                    "\t sw $v0, " + 4 * (call.Dest.Id + 1) + "($sp) \n";
+            int i = -12;
+            
+            foreach (var arg in call.Args)
+            {
+                if (int.TryParse(arg, out int n))
+                {
+                    Text += "\t li $a0, " + n + "\n" +
+                            "\t sw $a0, " + i + "($sp) \n";
+                }
+                else
+                {
+                    Text += "\t lw $a0, " + CurrentScope.VarInStack[arg] + "($fp) \n" +
+                            "\t sw $a0, " + i + "($sp) \n";
+                }
+
+                i -= 4;
+            }
+
+            Text += "\t jal " + call.Name + "\n" +
+                    "\t sw $v0, " + CurrentScope.VarInStack[call.Dest] + "($fp) \n";
         }
 
         public void Accept(CIL_Load load)
         {
-            int posDes = 4 * (load.Dest.Id + 1);
-            int posMsg = 4 * (load.Msg.Id + 1);
-
-            Text += "\t lw $t0, " + posMsg + "($sp) \n" +
-                    "\t sw $t0, " + posDes + "($sp) \n";
+            Text += "\t la $t0, " + load.Msg + "\n" +
+                    "\t sw $t0, " + CurrentScope.VarInStack[load.Dest] + "($fp) \n";
         }
 
         public void Accept(CIL_Length length)
@@ -226,7 +236,7 @@ namespace AST_CIL
 
         public void Accept(CIL_Label label)
         {
-            Text += "$" + label._label + "\n";
+            Text += "$" + label._label + ": \n";
         }
 
         public void Accept(CIL_Goto _goto)
@@ -236,18 +246,17 @@ namespace AST_CIL
 
         public void Accept(CIL_Return _return)
         {
-            if (_return._atom == null) return;
-            
-            if (_return._atom is CIL_MyVar myVar)
+            if (int.TryParse(_return.value, out int n))
             {
-                Text += "\t lw $v0, " + 4 * (myVar.Id + 1) + "($sp) \n";
+                Text += "\t li $v0, " + n + "\n";
             }
             else
             {
-                Text += "\t li $v0, " + ((CIL_MyCons) _return._atom).Value + "\n";
+                Text += "\t lw $v0, " + CurrentScope.VarInStack[_return.value] + "($fp) \n";
             }
         }
 
+        // TODO: me quede por aqui, hacer los diferentes reads y prints
         public void Accept(CIL_Read read)
         {
             // modificar este buffer
@@ -271,13 +280,8 @@ namespace AST_CIL
 
         public void Accept(CIL_ConditionalJump cj)
         {
-            Text += "\t lw $t0, " + 4 * (cj.ConditionVar.Id + 1) + "($sp) \n" +
+            Text += "\t lw $t0, " + CurrentScope.VarInStack[cj.ConditionVar] + "($fp) \n" +
                     "\t bne $t0, $r0, $" + cj.Label + "\n";
-        }
-
-        public void Accept(CIL_Arg arg)
-        {
-            throw new System.NotImplementedException();
         }
     }
 }
