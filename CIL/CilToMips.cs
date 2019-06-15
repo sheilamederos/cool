@@ -49,8 +49,8 @@ namespace CIL
                     "\t zero:               .byte     0 \n" +
                     "\t strsubstrexception: .asciiz \"Substring index exception\" \n";
             
-            foreach (var strVar in data._stringVars)
-                Data += strVar.Item1 + ":\t .asciiz \t" + "\"" + strVar.Item2 + "\"\n";
+            foreach (var strVar in data._stringVars.Values)
+                Data += strVar + ":\t .asciiz \t" + "\"" + data._stringVars[strVar] + "\"\n";
         }
 
         public void Accept(CIL_Instruction ins)
@@ -292,14 +292,20 @@ namespace CIL
         {
         }
 
-        public void Accept(CIL_Print print)
+        public void Accept(CIL_Print_Int print)
         {
+            throw new NotImplementedException();
+        }
+
+        public void Accept(CIL_Print_Str print)
+        {
+            throw new NotImplementedException();
         }
 
         public void Accept(CIL_ConditionalJump cj)
         {
-            Text += "\t lw $t0, " + CurrentScope.VarInStack[cj.ConditionVar] + "($fp) \n" +
-                    "\t bne $t0, $r0, $" + cj.Label + "\n";
+            Text += "\t lw $t0, " + CurrentScope.VarInStack[cj.cond] + "($fp) \n" +
+                    "\t bne $t0, $r0, $" + cj.label + "\n";
         }
     }
 }

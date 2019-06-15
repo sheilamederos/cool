@@ -52,7 +52,9 @@ namespace CIL
 
         void Accept(CIL_Read read);
 
-        void Accept(CIL_Print print);
+        void Accept(CIL_Print_Int print);
+        
+        void Accept(CIL_Print_Str print);
 
         void Accept(CIL_ConditionalJump cj);
     }

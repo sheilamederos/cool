@@ -231,7 +231,7 @@ namespace CIL
         public override string ToString()
         {
             string ret = "";
-            ret += string.Format("{0} = CONCAT {1} {2}\n", Dest, Var1, Var2);
+            ret += string.Format("{0} = CONCAT {1} {2}\n", Dest, Msg1, Msg2);
             return ret;
         }
 
@@ -257,7 +257,7 @@ namespace CIL
         public override string ToString()
         {
             string ret = "";
-            ret += string.Format("{0} = SUBSTRING {1} {2} ;\n", Dest, Var1, Var2);
+            ret += string.Format("{0} = SUBSTRING {1} {2} ;\n", Dest, Index, Length);
             return ret;
         }
 
