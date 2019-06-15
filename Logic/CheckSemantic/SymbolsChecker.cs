@@ -95,6 +95,12 @@ namespace Logic.CheckSemantic
             Context.ActualType = Context.GetType(node.type.s);
             Context.DefineSymbol("self", Context.ActualType);
             List<string> id_defines = new List<string>();
+
+            // Definiendo atributos del padre
+            foreach (var attr in Context.GetType(node.inherit_type.s).AllAttributes())
+                Context.DefineSymbol(attr.Name, attr.Type);
+
+            // Definiendo los atributos del hijo
             foreach (var attr in node.attr.list_Node)
             {
                 if (id_defines.Contains(attr.name.name) || Context.ActualType.Father.GetAttribute(attr.name.name) != null)
@@ -261,23 +267,26 @@ namespace Logic.CheckSemantic
         public bool Visit(Dispatch node)
         {
             bool solve = this.Visit(node.exp);
+
+            IType type = new IType("", null);
             if (node.s != "sin castear ")
-            {
-                IType type = Context.ActualType;
-                Context.ActualType = Context.GetType(node.s);
-                solve &= this.Visit(node.call);
-                Context.ActualType = type;
-            }
+                type = Context.GetType(node.s);
             else
             {
-                IType type = Context.ActualType;
                 var type_checker = new TypeCheckerVisitor(Context);
-                Context.ActualType = type_checker.Visit(node.exp);
-                if (Context.ActualType == null) solve = false;
-                else solve &= this.Visit(node.call);
-                Context.ActualType = type;
+                type = type_checker.Visit(node.exp);
             }
 
+            foreach (var arg in node.call.args.list_Node)
+            {
+                solve &= this.Visit(arg);
+            }
+            if (!Context.IsDefineMethod(node.call.name.name, type))
+            {
+                Logger += "En la expresion " + node.ToString() + "-> error de identificador (metodo '" + node.call.name.name + "' no esta definido) \n";
+                solve = false;
+            }
+            
             return solve;
         }
 
