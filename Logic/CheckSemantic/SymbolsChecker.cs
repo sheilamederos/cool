@@ -33,6 +33,7 @@ namespace Logic.CheckSemantic
 
         public bool Visit(Program node)
         {
+            Context.DefineSymbol("void", Context.GetType("Object"));
             foreach (Class_Def cldr in node.list)
                 if (!this.Visit(cldr)) return false;
 

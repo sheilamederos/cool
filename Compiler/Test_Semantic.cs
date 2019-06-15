@@ -30,19 +30,21 @@ namespace Compiler
                 Console.WriteLine("Definiciones OK");
                 Dictionary<string, IType> types = IType.GetAllTypes(ast);
                 ContextType context = new ContextType(types);
-                var TypeCheck = new TypeCheckerVisitor(context);
-                TypeCheck.Visit(ast);
-                Console.WriteLine(TypeCheck.Logger);
-
-                context = new ContextType(types);
                 var SymChecker = new SymCheckerVisitor(context);
-                Console.WriteLine(SymChecker.Visit(ast));
+                bool check_sym = SymChecker.Visit(ast);
                 Console.WriteLine(SymChecker.Logger);
+
+                if (check_sym)
+                {
+                    Console.WriteLine("Simbolos OK");
+                    context = new ContextType(types);
+                    var TypeCheck = new TypeCheckerVisitor(context);
+                    TypeCheck.Visit(ast);
+                    Console.WriteLine(TypeCheck.Logger);
+                }
+                else Console.WriteLine("Simbolos al berro");
             }
-            else
-            {
-                Console.WriteLine("Definiciones al berro");
-            }
+            else Console.WriteLine("Definiciones al berro");
         }
     }
 }
