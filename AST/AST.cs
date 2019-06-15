@@ -48,14 +48,14 @@ namespace AST
 
         public override string ToString()
         {
-            return "Lista de" ; 
+            return "Lista de " + typeof(T).ToString() ; 
         }
     }
 
     public class Class_Def : Node
     {
-        Type_cool type;
-        Type_cool inherit_type;
+        public Type_cool type;
+        public Type_cool inherit_type;
         public Lista<Method_Def> method;
         public Lista<Attr_Def> attr;
         public Class_Def(Type_cool t, Type_cool t1, Lista<Method_Def> m, Lista<Attr_Def> a) : base(new Node[] { m, a })
@@ -113,7 +113,7 @@ namespace AST
 
         public override string ToString()
         {
-            return "atributo: " + name + " tipo: " + type;
+            return "atributo: " + name.ToString() + " tipo: " + type.ToString();
         }
     }    
 
@@ -121,10 +121,10 @@ namespace AST
     {
         public Id name;
         public Type_cool type;
-        public Formal(Id n, Type_cool t) : base (null)
+        public Formal(Id n, Type_cool t) : base (new Node[] { n, t })
         {
             name = n;
-            t = type;
+            type = t;
         }
 
         public override T Visit<T>(IVisitorAST<T> visitor) => visitor.Visit(this);
@@ -183,6 +183,41 @@ namespace AST
             return "Call_Method: " + name;
         }
     }
+    public class Dispatch : Expr
+    {
+        public Expr exp;
+        public Call_Method call;
+        public string s;
+        public Dispatch(Expr exp, Type_cool type, Call_Method call) : base (new Node[] { exp, type, call })
+        {
+            this.exp = exp;
+            this.type = type;
+            this.call = call;
+            s = (this.type != null) ? this.type.s + ' ' : "sin castear "; 
+        }
+
+        public override T Visit<T>(IVisitorAST<T> visitor) => visitor.Visit(this);
+
+        public override string ToString()
+        {
+            return "Dispatch: " + "Exp: " + exp.ToString() + " " + "tipo: " + this.s + call.ToString() ;
+        }
+    }
+
+    public class Str : Expr
+    {
+        public string s;
+        public Str(string s) : base (null)
+        {
+            this.s = s.Substring(1, s.Length - 2);
+        }
+        public override T Visit<T>(IVisitorAST<T> visitor) => visitor.Visit(this);
+
+        public override string ToString()
+        {
+            return s;
+        }
+    }
 
     public class Let_In : Expr
     {
@@ -205,24 +240,24 @@ namespace AST
 
     public class If_Else : Expr
     {
-        Expr exp1, exp2, exp3;
+        public Expr cond, then, elsse;
         public If_Else(Expr e1, Expr e2, Expr e3) : base(new Node[] { e1, e2, e3 })
         {
-            exp1 = e1;
-            exp2 = e2;
-            exp3 = e3;
+            cond = e1;
+            then = e2;
+            elsse = e3;
         }
         public override T Visit<T>(IVisitorAST<T> visitor) => visitor.Visit(this);
 
         public override string ToString()
         {
-            return "If: " + exp1.ToString() + " Then: " + exp2.ToString() + " Else: " + exp3.ToString();
+            return "If: " + cond.ToString() + " Then: " + then.ToString() + " Else: " + elsse.ToString();
         }
     }
 
     public class While_loop : Expr
     {
-        Expr exp1, exp2;
+        public Expr exp1, exp2;
         public While_loop(Expr e1, Expr e2) : base(new Node[] { e1, e2 })
         {
             exp1 = e1;
@@ -238,7 +273,7 @@ namespace AST
 
     public class Body : Expr
     {
-        Lista<Expr> list;
+        public Lista<Expr> list;
         public Body(Lista<Expr> l) : base(new Node[] {l})
         {
             list = l;
@@ -270,7 +305,7 @@ namespace AST
 
     public class IsVoid : Expr
     {
-        Expr exp;
+        public Expr exp;
         public IsVoid(Expr e) : base (new Node[] { e})
         {
             exp = e;
@@ -322,7 +357,7 @@ namespace AST
     {
         public Id id;
         public Expr exp;
-        public Assign(Id id, Expr exp) : base (new Node[] { exp})
+        public Assign(Id id, Expr exp) : base (new Node[] { id, exp})
         {
             this.id = id;
             this.exp = exp;
@@ -332,7 +367,7 @@ namespace AST
 
         public override string ToString()
         {
-            return id.name + ' ' + "<-"+ ' ' + exp.ToString();
+            return "Assign";
         }
     }
 
@@ -365,5 +400,7 @@ namespace AST
             return name;
         }
     }
+
+    
 
 }

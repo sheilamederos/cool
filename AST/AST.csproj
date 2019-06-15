@@ -43,11 +43,7 @@
     <Compile Include="COOLtoCIL.cs" />
     <Compile Include="AST.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Types\TypeInt.cs" />
-    <Compile Include="Types\TypeObject.cs" />
     <Compile Include="Types\Types.cs" />
-    <Compile Include="Types\TypeSelf.cs" />
-    <Compile Include="Types\TypeString.cs" />
     <Compile Include="Visitor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

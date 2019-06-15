@@ -19,6 +19,8 @@ namespace Logic
             var lexer = new coolgrammarLexer(input);
             var tokens = new CommonTokenStream(lexer);
             var parser = new coolgrammarParser(tokens);
+            //Console.WriteLine(parser.program().ToString(parser));
+            
             var v = new Transpiler();
             return v.Visit(parser.program());
         }
@@ -28,10 +30,11 @@ namespace Logic
     {
         public override Node VisitAssign([NotNull] coolgrammarParser.AssignContext context)
         {
-            Id id = (Id)Visit(context.ID());
             Expr r = (Expr)Visit(context.expr());
-            return new Assign(id, r);
+            return new Assign(new Id(context.ID().GetText()), r);
         }
+        
+
         public override Node VisitSumaresta([NotNull] coolgrammarParser.SumarestaContext context)
         {
             Expr l = (Expr)Visit(context.expr(0));
@@ -101,7 +104,7 @@ namespace Logic
 
             string father;
             if (context.TYPE().Length > 1) father = context.TYPE(1).GetText();
-            else father = "object";
+            else father = "Object";
 
             return new Class_Def(new Type_cool(context.TYPE(0).GetText()), new Type_cool(father), new Lista<Method_Def>(met), new Lista<Attr_Def>(attr));
         }
@@ -131,13 +134,20 @@ namespace Logic
         public override Node VisitAttr([NotNull] coolgrammarParser.AttrContext context)
         {
             var a = (Formal)Visit(context.formal());
-            var exp = (Expr)Visit(context.expr());
-            return new Attr_Def(a.name, a.type, exp);
+
+            if (context.ChildCount > 1)
+            {
+                var exp = (Expr)Visit(context.expr());
+                return new Attr_Def(a.name, a.type, exp);
+            }
+            return new Attr_Def(a.name, a.type, null);
         }
 
         public override Node VisitFormal([NotNull] coolgrammarParser.FormalContext context)
         {
-            return new Formal(new Id(context.ID().GetText()), new Type_cool(context.TYPE().GetText()));
+            var id = new Id(context.ID().GetText());
+            var t = new Type_cool(context.TYPE().GetText());
+            return new Formal(id,t);
         }
 
         public override Node VisitCall_method([NotNull] coolgrammarParser.Call_methodContext context)
@@ -151,6 +161,21 @@ namespace Logic
             return new Call_Method(new Id(context.ID().GetText()), new Lista<Expr>(list));
         }
 
+        public override Node VisitDispatch([NotNull] coolgrammarParser.DispatchContext context)
+        {
+            Expr exp = (Expr)Visit(context.expr());
+            Type_cool t = null;
+            if (context.TYPE() != null) t = new Type_cool(context.TYPE().GetText());
+            Id id = new Id(context.ID().GetText());
+            var list = new List<Expr>();
+            foreach (var item in context.args_call().expr())
+            {
+                var v = Visit(item);
+                list.Add((Expr)v);
+            }
+
+            return new Dispatch(exp, t, new Call_Method(id, new Lista<Expr>(list)));
+        }
         public override Node VisitLet([NotNull] coolgrammarParser.LetContext context)
         {
             List<Attr_Def> list = new List<Attr_Def>();
@@ -190,6 +215,11 @@ namespace Logic
                 list.Add(v);
             }
             return new Body(new Lista<Expr>(list));
+        }
+
+        public override Node VisitString([NotNull] coolgrammarParser.StringContext context)
+        {
+            return new Str(context.STR().GetText());
         }
 
         public override Node VisitNew_type([NotNull] coolgrammarParser.New_typeContext context)

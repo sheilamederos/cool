@@ -26,7 +26,11 @@ namespace AST
 
         T Visit(Expr node);
 
+        T Visit(Str node);
+
         T Visit(Call_Method node);
+
+        T Visit(Dispatch node);
 
         T Visit(Let_In node);
 

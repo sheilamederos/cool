@@ -4,72 +4,113 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AST;
-using AST.Types;
 
 namespace Logic.CheckSemantic
 {
-    public interface IContext
+    public class ContextType
     {
-        IType GetType(string type);
-        IType GetTypeFor(string symbol);
-        IContext CreateChildContext();
-        bool DefineSymbol(string symbol, IType type);
-        IType CreateType(string name, IType father);
-    }
+        public IType ActualType { get; set; }
 
-    public class ContextType : IContext
-    {
-        ContextType Father { get; set; }
+        public Dictionary<string, IType> Types { get; set; }
 
-        List<IType> Types { get; set; }
+        public List<Method> Methods { get; set; }
 
-        Dictionary<string, IType> Symbols { get; set; }
+        public Stack<Tuple<string, IType>> Symbols { get; set; }
 
-        public ContextType(ContextType father)
+        public ContextType(Dictionary<string, IType> types)
         {
-            Father = father;
-            Types = new List<IType>();
-            Symbols = new Dictionary<string, IType>();
+            Types = types;
+            Symbols = new Stack<Tuple<string, IType>>();
+            Methods = new List<Method>();
         }
 
-        public IContext CreateChildContext()
+        public bool IsDefineSymbol(string name)
         {
-            return new ContextType(this);
+
+            foreach (var t in Symbols)
+                if (t.Item1 == name) return true;
+            return false;
         }
 
-        public IType CreateType(string name, IType father)
+        public bool IsDefineType(string name)
         {
-            IType type = new ComposeType(name, father);
-
-            Types.Add(type);
-
-            return type;
+            return Types.ContainsKey(name);
         }
 
-        public bool DefineSymbol(string symbol, IType type)
+        public void AddType(IType type)
         {
-            if (!Symbols.ContainsKey(symbol)) return false;
+            Types[type.Name] = type;
+        }
 
-            if (!Types.Contains(type)) return false;
-
-            Symbols[symbol] = type;
-
-            return true;
+        public void DefineSymbol(string symbol, IType type)
+        {
+            Symbols.Push(new Tuple<string, IType>(symbol, type));
         }
 
         public IType GetType(string type)
         {
-            foreach (IType t in Types)
-                if (t.Name == type) return t;
+            if (type == "SELF_TYPE") type = ActualType.Name;
+            if (IsDefineType(type))
+                return Types[type];
 
             return null;
         }
 
         public IType GetTypeFor(string symbol)
         {
-            if (!Symbols.ContainsKey(symbol)) return null;
+            foreach (var tuple in Symbols)
+                if (tuple.Item1 == symbol) return tuple.Item2;
 
-            return Symbols[symbol];
+            return null; 
+        }
+
+        public void UndefineSymbol()
+        {
+            Symbols.Pop();
+        }
+
+        public void UndefineSymbol(int count)
+        {
+            if (count > 0)
+            {
+                UndefineSymbol();
+                UndefineSymbol(--count);
+            }
+        }
+
+        public bool IsDefineMethod(string name, IType type)
+        {
+            foreach (var item in type.AllMethods())
+            {
+                if (item.Name == name) return true;
+            }
+            return false;
+        }
+
+        public bool ThereAreMethod(string name)
+        {
+            foreach (var item in Methods)
+            {
+                if (item.Name == name) return true;
+            }
+            return false;
+        }
+
+        public void DefineMethod(string m, IType type)
+        {
+            foreach (var item in type.Methods)
+            {
+                if(item.Name == m)
+                {
+                    Methods.Add(item);
+                    break;
+                }
+            }
+        }
+
+        public void UndefineMethods()
+        {
+            Methods = new List<Method>();
         }
     }
 }

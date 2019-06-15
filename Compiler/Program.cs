@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AST;
 using Logic;
+using System.IO;
 
 namespace Compiler
 {
@@ -20,7 +21,7 @@ namespace Compiler
 
             foreach (var item in a.children)
             {
-                DFS(item, level + 1);
+                DFS(item, level + 3);
             }
 
             for (int i = 0; i < level; i++) Console.Write("-");
@@ -29,34 +30,13 @@ namespace Compiler
             Console.WriteLine("> {0} ", a.ToString());
 
         }
-        static void Main(string[] args)
+        static void Main1(string[] args)
         {
-            string text = @" 
-                    class Sheila inherits Persona
-                    {
-                        Edad : int <- 22;
-                        Mujer : bool <- true;
-                        Novio : Persona <- new Persona;
-                        i : INT <- 10;
-
-                        metodo1() : int {{while i > 0 loop i <- i - 1 pool; i; }};
-
-                        metodo2() : int { let a : int <- 3, b : int <- 5 in a * b; };
-
-                        metodo4() : bool { not true; };
-                    }; ";
-            DFS(GetAST.Show(text));
-            /* Edad <- 22;
-                        Mujer <- true;
-                        Novio: Persona <- new Persona;
-
-                        i <- 10;
-                        metodo1() : int {{while i > 0 loop i <- i - 1 pool; i; }};
-
-                        metodo2() : int{ let a : int <- 3, b : int <- 5 in a * b; };
-
-
-                        metodo4() : bool { not true; };*/
+            StreamReader x = new StreamReader("a.txt");
+            string adsa = x.ReadToEnd();
+            Console.WriteLine(adsa);
+            DFS(GetAST.Show(adsa));
+           
         }
     }
 }
