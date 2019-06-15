@@ -149,7 +149,7 @@ namespace AST_CIL
         public string Name { get; }
         public int Id { get; }
 
-        public CIL_MyVar(string name, int id)
+        public CIL_MyVar(string name, int id=0)
         {
             Name = name;
             Id = id;

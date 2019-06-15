@@ -10,12 +10,12 @@ namespace AST_CIL
 
         private static int _buffer = 0;
 
-        private string GetBuffer()
-        {
-            var result = "buffer" + _buffer;
-            _buffer++;
-            return result;
-        }
+//        private string GetBuffer()
+//        {
+//            var result = "buffer" + _buffer;
+//            _buffer++;
+//            return result;
+//        }
         
         public void Accept(CIL_Program prog)
         {            
@@ -40,7 +40,9 @@ namespace AST_CIL
         }
 
         public void Accept(CIL_Data data)
-        {            
+        {
+            Data += "\t buffer: .space 65536 \n";
+            
             foreach (var strVar in data._stringVars)
                 Data += strVar.Item1 + ":\t .asciiz \t" + "\"" + strVar.Item2 + "\"\n";
         }
@@ -52,21 +54,24 @@ namespace AST_CIL
 
         public void Accept(CIL_Function function)
         {
-            // TODO:calcualar este n, es la cantidad de espacios que voy a reservar para esta funcion en el stack
-            int n = 0; 
+            // Las funciones van a recivir los parametros a partir de la
+            // tercera posicion del stack (-12($sp)), en las dos primeras
+            // van ra (-4($sp)) y fp (-8($sp))
+            // Despues de los Args van los Locals
+            int n = 4 * (function.Args.Count + function.Locals.Count + 2); 
 
             Text += function.Name + ":\n";
 
-            Text += "\t subu $sp, $sp, " + n + "\n" +
-                    "\t sw $ra, 20($sp) \n" +
-                    "\t sw $fp, 16($sp) \n" +
+            Text += "\t sw $ra, -4($sp) \n" +
+                    "\t sw $fp, -8($sp) \n" +
+                    "\t subu $sp, $sp, " + n + "\n" +
                     "\t addu $fp, $sp, " + n + "\n";
 
             foreach (var inst in function.Instructions)
                 inst.Accept(this);
             
-            Text += "\t lw $ra, 20($sp) \n" +
-                    "\t lw $fp, 16($sp) \n" +
+            Text += "\t lw $ra, -4($fp) \n" +
+                    "\t lw $fp, -8($fp) \n" +
                     "\t addu $sp, $sp, " + n + "\n" +
                     "\t j $ra \n"; // aqui por el momento voy a poner j pero puede ser jr
         }
@@ -79,6 +84,7 @@ namespace AST_CIL
 
         public void Accept(CIL_Assig assig)
         {
+            // TODO: Revisar esto con Ale
             int destPos = 4 * (assig.Dest.Id + 1);
 
             if (assig.RigthMem is CIL_MyVar rigthMem)
@@ -120,6 +126,7 @@ namespace AST_CIL
 
         public void Accept(CIL_ArithExpr arithExpr)
         {
+            // TODO: La misma
             int desPos = 4 * (arithExpr.Dest.Id + 1);
 
             // Calculando la direccion de memoria o el entero
@@ -193,6 +200,7 @@ namespace AST_CIL
 
         public void Accept(CIL_Call call)
         {
+            // Ponerle al call la lista de argumentos
             Text += "\t jal " + call.MyFunc.Name + "\n" +
                     "\t sw $v0, " + 4 * (call.Dest.Id + 1) + "($sp) \n";
         }
@@ -242,7 +250,8 @@ namespace AST_CIL
 
         public void Accept(CIL_Read read)
         {
-            string buffer = GetBuffer();
+            // modificar este buffer
+            string buffer = "asdasdasd";
             Data += "\t " + buffer + ": .space 65536 \n";
             
             // Creo q va a ser un problema leer siempre con el mismo buffer

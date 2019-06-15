@@ -41,6 +41,7 @@
     <Compile Include="AST.cs" />
     <Compile Include="CilToMips.cs" />
     <Compile Include="IVisit.cs" />
+    <Compile Include="PlantillaMIPS.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
