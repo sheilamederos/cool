@@ -29,20 +29,28 @@ namespace Compiler
             {
                 Console.WriteLine("Definiciones OK");
                 Dictionary<string, IType> types = IType.GetAllTypes(ast);
-                ContextType context = new ContextType(types);
-                var SymChecker = new SymCheckerVisitor(context);
-                bool check_sym = SymChecker.Visit(ast);
-                Console.WriteLine(SymChecker.Logger);
 
-                if (check_sym)
+                bool check_inherits = InheritsChecker.Check(ast, types);
+                if (check_inherits)
                 {
-                    Console.WriteLine("Simbolos OK");
-                    context = new ContextType(types);
-                    var TypeCheck = new TypeCheckerVisitor(context);
-                    TypeCheck.Visit(ast);
-                    Console.WriteLine(TypeCheck.Logger);
+                    Console.WriteLine("Herencia OK");
+                    ContextType context = new ContextType(types);
+                    var SymChecker = new SymCheckerVisitor(context);
+                    bool check_sym = SymChecker.Visit(ast);
+                    Console.WriteLine(SymChecker.Logger);
+
+                    if (check_sym)
+                    {
+                        Console.WriteLine("Simbolos OK");
+
+                        context = new ContextType(types);
+                        var TypeCheck = new TypeCheckerVisitor(context);
+                        TypeCheck.Visit(ast);
+                        Console.WriteLine(TypeCheck.Logger);
+                    }
+                    else Console.WriteLine("Simbolos al berro");
                 }
-                else Console.WriteLine("Simbolos al berro");
+                else Console.WriteLine("Herencia al berro");
             }
             else Console.WriteLine("Definiciones al berro");
         }
@@ -105,17 +113,21 @@ namespace Compiler
             if (check_def)
             {
                 Dictionary<string, IType> types = IType.GetAllTypes(ast);
-                ContextType context = new ContextType(types);
-                var SymChecker = new SymCheckerVisitor(context);
-                check_sym = SymChecker.Visit(ast);
-
-                if (check_sym)
+                bool check_inherits = InheritsChecker.Check(ast, types);
+                if (check_inherits)
                 {
-                    context = new ContextType(types);
-                    var TypeCheck = new TypeCheckerVisitor(context);
-                    TypeCheck.Visit(ast);
-                    check_types = TypeCheck.Logger == "";
-                }               
+                    ContextType context = new ContextType(types);
+                    var SymChecker = new SymCheckerVisitor(context);
+                    check_sym = SymChecker.Visit(ast);
+
+                    if (check_sym)
+                    {
+                        context = new ContextType(types);
+                        var TypeCheck = new TypeCheckerVisitor(context);
+                        TypeCheck.Visit(ast);
+                        check_types = TypeCheck.Logger == "";
+                    }
+                }          
             }
 
             return new Tuple<bool, bool, bool>(check_def, check_sym, check_types);

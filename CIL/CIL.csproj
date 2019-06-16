@@ -45,6 +45,7 @@
     <Compile Include="IVisit.cs" />
     <Compile Include="PlantillaMIPS.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SystemFunctions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="README.md" />

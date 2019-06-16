@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CheckSemantic\InheritsChecker.cs" />
     <Compile Include="CheckSemantic\Contexts.cs" />
     <Compile Include="CheckSemantic\DefinitionsChecker.cs" />
     <Compile Include="CheckSemantic\SymbolsChecker.cs" />
