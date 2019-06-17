@@ -117,7 +117,7 @@ namespace CIL
             List<string> locals = new List<string> { "local_object_type_name_ret" };
             List<CIL_Instruction> inst = new List<CIL_Instruction>();
 
-            inst.Add(new CIL_Typeof("local_object_type_name_ret", "this"));
+            //inst.Add(new CIL_TypeName("local_object_type_name_ret", "this"));
             inst.Add(new CIL_Return("local_object_type_name_ret"));
 
             return new CIL_Function("Object_type_name", args, locals, inst);
@@ -129,7 +129,7 @@ namespace CIL
             List<string> locals = new List<string> { };
             List<CIL_Instruction> inst = new List<CIL_Instruction>();
 
-            //inst.Add(new CIL_Halt());
+            //inst.Add(new CIL_Halt("Abort es ejecutado"));
             inst.Add(new CIL_Return(""));
 
             return new CIL_Function("Object_abort", args, locals, inst);
