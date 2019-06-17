@@ -19,6 +19,8 @@ namespace Compiler
 
             //Debug_Semantic_Files_Success();
 
+            //Debug_Semantic_Files_Fails();
+
             AST.Program ast = (AST.Program)GetAST.Show(text);
             Program.DFS(ast);
 
@@ -55,6 +57,51 @@ namespace Compiler
             else Console.WriteLine("Definiciones al berro");
         }
 
+        private static void Debug_Semantic_Files_Fails()
+        {
+            string fail_path = "../../../../cooltestcases/Semantics/fail";
+            var dir = new DirectoryInfo(fail_path);
+            int count = 0;
+            int total = 0;
+            foreach (var item in dir.GetFiles())
+            {
+                if (item.Extension == ".cl")
+                {
+                    var f = new StreamReader(item.FullName);
+
+                    string text = f.ReadToEnd();
+
+                    try
+                    {
+                        var solve = Debug_Semantic(text);
+                        if (!solve.Item1 || !solve.Item2 || !solve.Item3 || !solve.Item4)
+                        {
+
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.Write("OK: ");
+                            count++;
+                        }
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.Magenta;
+                            Console.Write("Wrong: {0} {1} {2}  ", solve.Item1, solve.Item2, solve.Item3, solve.Item4);
+                        }
+                    }
+                    catch
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.Write("Broken: ");
+                    }
+
+                    Console.WriteLine(item.Name);
+                    Console.ResetColor();
+                    total++;
+                }
+            }
+            Console.WriteLine($"A: {count}, T: {total}, Acc: {(double)(1.0 * count / total) * 100.0}");
+
+        }
+
         public static void Debug_Semantic_Files_Success()
         {
             string success_path = "../../../../cooltestcases/Semantics/success";
@@ -72,7 +119,7 @@ namespace Compiler
                     try
                     {
                         var solve = Debug_Semantic(text);
-                        if (solve.Item1 && solve.Item2 && solve.Item3)
+                        if (solve.Item1 && solve.Item2 && solve.Item3 && solve.Item4)
                         {
 
                             Console.ForegroundColor = ConsoleColor.Green;
@@ -99,7 +146,7 @@ namespace Compiler
             Console.WriteLine($"A: {count}, T: {total}, Acc: {(double)(1.0 * count / total) * 100.0}");
         }
 
-        private static Tuple<bool, bool, bool> Debug_Semantic(string text)
+        private static Tuple<bool, bool, bool, bool> Debug_Semantic(string text)
         {
             AST.Program ast = (AST.Program)GetAST.Show(text);
             //Program.DFS(ast);
@@ -107,13 +154,14 @@ namespace Compiler
             bool check_def = false;
             bool check_types = false;
             bool check_sym = false;
+            bool check_inherits = false;
 
             var DefChecker = new DefinitionsChecker();
             check_def = DefChecker.Visit(ast);
             if (check_def)
             {
                 Dictionary<string, IType> types = IType.GetAllTypes(ast);
-                bool check_inherits = InheritsChecker.Check(ast, types);
+                check_inherits = InheritsChecker.Check(ast, types);
                 if (check_inherits)
                 {
                     ContextType context = new ContextType(types);
@@ -130,7 +178,7 @@ namespace Compiler
                 }          
             }
 
-            return new Tuple<bool, bool, bool>(check_def, check_sym, check_types);
+            return new Tuple<bool, bool, bool, bool>(check_def, check_sym, check_types, check_inherits);
         }
     }
 }

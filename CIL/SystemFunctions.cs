@@ -123,18 +123,31 @@ namespace CIL
             return new CIL_Function("Object_type_name", args, locals, inst);
         }
 
-        // Falta abort y copy
+        public static CIL_Function Fun_abort()
+        {
+            List<string> args = new List<string> { "this" };
+            List<string> locals = new List<string> { };
+            List<CIL_Instruction> inst = new List<CIL_Instruction>();
+
+            //inst.Add(new CIL_Halt());
+            inst.Add(new CIL_Return(""));
+
+            return new CIL_Function("Object_abort", args, locals, inst);
+        }
+
+        public static CIL_Function Fun_copy()
+        {
+            List<string> args = new List<string> { "this" };
+            List<string> locals = new List<string> { "local_object_copy_ret" };
+            List<CIL_Instruction> inst = new List<CIL_Instruction>();
+
+            //inst.Add(new CIL_Copy("local_object_copy_ret", "this"));
+            inst.Add(new CIL_Return("local_object_copy_ret"));
+
+            return new CIL_Function("Object_copy", args, locals, inst);
+        }
+
         #endregion
 
     }
 }
-
-
-
-
-
-
-
-
-
-
